@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | John Paul Tamares</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../assets/adminPageStyle.css">
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">
+            <img src="../assets/logowDAA.png" alt="Company Logo">
+            WELCOME, ADMIN!
+        </a>
+    </header>
+
+    <main class="dashboard">
+        <div class="left-section">
+            <div class="total-reports">
+                <h2>Total Reports</h2>
+                <div class="report-number">10</div>
+            </div>
+
+            <div class="chart-section">
+                <h3>Reports by Location</h3>
+                <div class="chart-container">
+                    <svg class="pie-chart" viewBox="0 0 200 200" width="200" height="200">
+                        <!-- Teresa (50%) -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#dc3545" stroke-width="20"
+                                stroke-dasharray="251.2 251.2" stroke-dashoffset="0" transform="rotate(-90 100 100)"></circle>
+                        
+                        <!-- Pueza (30%) -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#fd7e14" stroke-width="20"
+                                stroke-dasharray="150.7 150.7" stroke-dashoffset="-251.2" transform="rotate(-90 100 100)"></circle>
+                        
+                        <!-- Aronas (20%) -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#ffc107" stroke-width="20"
+                                stroke-dasharray="100.5 100.5" stroke-dashoffset="-401.9" transform="rotate(-90 100 100)"></circle>
+                    </svg>
+                    
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #dc3545;"></span>
+                            <span class="legend-text">Teresa (50%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #fd7e14;"></span>
+                            <span class="legend-text">Pueza (30%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #ffc107;"></span>
+                            <span class="legend-text">Aronas (20%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-card">
+                <h3>Summary of Reports as of 6/13/25</h3>
+                
+                <div class="table-container">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Road</th>
+                                <th>Type of Road</th>
+                                <th>Severity</th>
+                                <th>Type of Defect</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="priority-badge priority-1">1</span>
+                                </td>
+                                <td>Teresa Municipal</td>
+                                <td>Municipal</td>
+                                <td>
+                                    <span class="severity-badge severity-high">
+                                        <i class='bx bx-error'></i>
+                                        High
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="defect-info">
+                                        <strong>Manhole</strong>
+                                        <span class="defect-detail">Cover Missing</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="priority-badge priority-2">2</span>
+                                </td>
+                                <td>Pueza Municipal</td>
+                                <td>Municipal</td>
+                                <td>
+                                    <span class="severity-badge severity-medium">
+                                        <i class='bx bx-construction'></i>
+                                        Medium
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="defect-info">
+                                        <strong>Crack</strong>
+                                        <span class="defect-detail">Surface Damage</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="priority-badge priority-3">3</span>
+                                </td>
+                                <td>Aronas Municipal</td>
+                                <td>Municipal</td>
+                                <td>
+                                    <span class="severity-badge severity-low">
+                                        <i class='bx bx-construction'></i>
+                                        Low
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="defect-info">
+                                        <strong>Pothole</strong>
+                                        <span class="defect-detail">Deep Depression</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="view-all-container">
+                    <button class="view-all-btn">View All Reports</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

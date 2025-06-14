@@ -1,0 +1,384 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Raleway', sans-serif;
+}
+
+body {
+    padding-top: 90px; 
+    position: static; 
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 100vh;
+    background: radial-gradient(circle at 20px 20px, rgba(255,223,59,0.03) 1px, transparent 1px),
+    linear-gradient(135deg, #ffffff 0%, #fffcf5 50%, #ffffff 100%);
+    background-size: 40px 40px, 100% 100%;
+    overflow: auto;
+}
+
+
+
+body::before {
+    content: none; 
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 5%;
+    background: linear-gradient(to right, #FAFAD2, #FFD300);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    height: 90px; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+}
+
+.logo img {
+    height: 80px; 
+    width: auto;
+    border-radius: 50%; 
+    object-fit: cover;
+    margin-top: 5px;
+}
+
+.navbar {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    height: auto;
+}
+
+.navbar li a {
+    text-decoration: none;
+    color: #333;
+    padding: 5px 10px;
+    transition: 0.3s;
+    position: relative;
+    font-weight: 500;
+}
+
+.navbar li a::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background-color: #333;
+    transition: 0.3s;
+}
+
+.navbar li a:hover::before {
+    width: 100%;
+}
+
+.navbar li a.active {
+    color: black;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.submitButton button {
+    padding: 10px 18px;
+    border: 2px solid #333;
+    background-color: transparent;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 600;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.submitButton button:hover {
+    background-color: #333;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.report-title {
+    align-items: flex-start;
+    padding-top: 40px;
+    padding-left: 160px;
+}
+
+.report-title h1 {
+    font-size: clamp(32px, 5vw, 46px); 
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #fff, #f0f0f0);
+    background-clip: text;
+    line-height: 1.1; 
+    letter-spacing: -0.02em; 
+}
+
+.report-title p {
+    font-size: clamp(16px, 1vw, 16px); 
+    font-weight: 100;
+    color: black;
+    margin-bottom: 24px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1.1; 
+    letter-spacing: -0.02em;
+}
+
+.form-sections {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    padding: 20px 50px;
+    max-width: 1800px;
+    margin: 0 auto 0 100px;
+    box-sizing: border-box;
+    flex-wrap: wrap; 
+}
+
+.personal-info-wrapper,
+.issue-details-wrapper {
+    flex: 1;
+    min-width: 600px;
+    width: 55%;
+    margin: 20px 0;
+    padding: 40px;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.personal-info-wrapper {
+  background: linear-gradient(to right, #fff8dc, #fff4b2);
+    border: 2px solid #ffd43b;
+}
+
+.personal-info-wrapper:hover {
+    transform: translateY(-10px);
+    border-color: #ffcc00;
+    box-shadow:
+        0 0 10px rgba(255, 223, 50, 0.4),
+        0 0 30px rgba(255, 223, 50, 0.1);
+}
+
+.issue-details-wrapper {
+    background: linear-gradient(to right, #fff8dc, #fff4b2);
+    border: 2px solid #ffd43b;
+}
+
+.issue-details-wrapper:hover {
+    transform: translateY(-10px);
+    border-color: #ffcc00;
+    box-shadow:
+        0 0 10px rgba(255, 223, 50, 0.4),
+        0 0 30px rgba(255, 223, 50, 0.1);
+}
+
+.section-title {
+    padding-bottom: 20px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.field,
+.form-group {
+    margin-bottom: 20px;
+}
+
+.field-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.field-row .field {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.field.half {
+    flex: 0.5;
+}
+
+.field label,
+.form-group label {
+    display: block;
+    font-size: 12px;
+    color: #333;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.field input,
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    background: white;
+    font-size: 16px;
+    color: #2c3e50;
+    transition: all 0.3s ease;
+}
+
+.field input:focus,
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: black;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    transform: translateY(-1px);
+}
+
+.description{
+    flex: 1;
+    min-width: 600px;
+    width: 86%;
+    padding: 40px;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: linear-gradient(to right, #fff8dc, #fff4b2);
+    border: 2px solid #ffd43b;
+    margin: 0 auto 0 150px;
+}
+
+.description:hover {
+    transform: translateY(-10px);
+    border-color: #ffcc00;
+    box-shadow:
+        0 0 10px rgba(255, 223, 50, 0.4),
+        0 0 30px rgba(255, 223, 50, 0.1);
+}
+
+.description label{
+    display: block;
+    font-size: 12px;
+    color: #333;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.description input{
+     width: 100%;
+    padding: 30px 20px;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    background: white;
+    font-size: 16px;
+    color: #2c3e50;
+    transition: all 0.3s ease;
+}
+
+.upload-section {
+    min-width: 600px;
+    width: 86%;
+    padding: 40px;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: linear-gradient(to right, #fff8dc, #fff4b2);
+    border: 2px dashed #ffd43b;
+    margin: 40px auto 0 150px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.upload-section:hover {
+    transform: translateY(-10px);
+    border-color: #ffcc00;
+    box-shadow:
+        0 0 10px rgba(255, 223, 50, 0.4),
+        0 0 30px rgba(255, 223, 50, 0.1);
+}
+
+.upload-label {
+    display: block;
+    cursor: pointer;
+}
+
+.upload-icon i {
+    font-size: 50px;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.upload-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.upload-subtext {
+    font-size: 14px;
+    color: #555;
+    margin-top: 4px;
+}
+
+.submitReportButton button {
+    padding: 10px 40px;
+    border: 2px solid #333;
+    background-color: transparent;
+    color: #333;
+    border-radius: 35px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 600;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.submitReportButton button:hover {
+    background-color: #333;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.cancelButton button {
+    padding: 10px 40px;
+    border: 2px solid #333;
+    background-color: transparent;
+    color: #333;
+    border-radius: 35px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 600;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cancelButton button:hover {
+    background-color: #333;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    margin-right: 90px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+
