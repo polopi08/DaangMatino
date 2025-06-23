@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../assets/reportPageStyle.css">
+    <link rel="stylesheet" href="../assets/thankYouPopUp.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 
@@ -22,7 +23,7 @@
             <li><a href="#guidelines">Guidelines</a></li>
         </ul>
         <div class="submitButton">
-            <button type="submit" form="reportForm">Submit Report</button>
+            <button type="button" onclick="showThankYouPopUp()">Submit Report</button>
         </div>
     </header>
 
@@ -123,14 +124,91 @@
 <div class="buttonContainer">
 
     <div class="cancelButton">
-            <button type="cancelo" form="reportForm">Cancel</button>
+            <button type="button" onclick="cancelReport()">Cancel</button>
         </div>
 
     <div class="submitReportButton">
-            <button type="submitReport" form="reportForm">Submit</button>
+            <button type="button" onclick="showThankYouPopUp()">Submit</button>
         </div>
 
 </div>
     </form>
+
+    <div id="thankYouPopUp" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="success-icon">
+                    <i class='bx bx-check-circle'></i>
+                </div>
+                <h2 class="modal-title">Thank You for Your Report!</h2>
+                <p class="modal-message">Your road issue report has been successfully submitted. It will be reviewed by professionals and take appropriate action.</p>
+                <div class="modal-details">
+                    <p><strong>What happens next?</strong></p>
+                    <ul>
+                        <li>Lorem ipsum dolor sit amet.</li>
+                        <li>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Officia, sed.</li>
+                        <li>Lorem ipsum dolor sit amet consectetur adipisicing.</li>
+                    </ul>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn-primary" onclick="closeModalAndRedirect()">Go to Home</button>
+                    <button class="btn-secondary" onclick="closeModalAndReset()">Submit Another Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showThankYouPopUp() {
+            // Basic form validation
+            const requiredFields = document.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = '#e74c3c';
+                } else {
+                    field.style.borderColor = '#bdc3c7';
+                }
+            });
+            
+            if (isValid) {
+                document.getElementById('thankYouPopUp').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            } else {
+                alert('Please fill in all required fields.');
+            }
+        }
+        
+        function closeModalAndRedirect() {
+            document.getElementById('thankYouPopUp').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            // Redirect to home page
+            window.location.href = 'landingPage.html';
+        }
+        
+        function closeModalAndReset() {
+            document.getElementById('thankYouPopUp').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            // Reset the form
+            document.getElementById('reportForm').reset();
+        }
+        
+        function cancelReport() {
+            if (confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+                document.getElementById('reportForm').reset();
+                window.location.href = 'landingPage.html';
+            }
+        }
+        
+        // Close modal when clicking outside of it
+        document.getElementById('thankYouPopUp').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('thankYouPopUp').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
 </body>
 </html>
