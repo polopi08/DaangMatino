@@ -1,0 +1,40 @@
+{
+  "name": "daangmatino",
+  "version": "1.0.0",
+  "description": "Road Network Maintenance Planning System - A civic technology platform for reporting and managing road infrastructure issues",
+  "main": "pages/landingPage.html",
+  "scripts": {
+    "dev": "npx http-server . -p 3000 -o",
+    "start": "npx http-server . -p 8080",
+    "build": "echo 'Static site - no build step required'",
+    "preview": "npx http-server . -p 4173 -o",
+    "install-deps": "npm install",
+    "serve": "npx http-server . -p 3000 -c-1"
+  },
+  "keywords": [
+    "civic-tech",
+    "road-maintenance",
+    "reporting-system",
+    "supabase",
+    "javascript",
+    "html",
+    "css"
+  ],
+  "author": "John Paul Tamares",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/daangmatino.git"
+  },
+  "homepage": "pages/landingPage.html",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}

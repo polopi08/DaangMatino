@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request Page | John Paul Tamares</title>
+    <title>Report Road Issue | DaangMatino</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="../assets/reportPageStyle.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../assets/reportPageStyle.css">
 </head>
 
-<body>
-    <header> 
-        <a href="#" class="logo">
+<body>    <header> 
+        <a href="landingPage.html" class="logo">
             <img src="../assets/logowDAA.png" alt="Company Logo">
             DaangMatino 
-        </a>
-        <ul class="navbar">
+        </a><ul class="navbar">
             <li><a href="landingPage.html">Home</a></li>
-            <li><a href="#help">Help</a></li>
-            <li><a href="#guidelines">Guidelines</a></li>
+            <li><a href="landingPage.html#features">Features</a></li>
+            <li><a href="analyticsPage.html">Analytics</a></li>
+            <li><a href="landingPage.html#about">About Us</a></li>
+            <li><a href="landingPage.html#contact">Contact</a></li>
+            <li><a href="maps.html">Maps</a></li>
         </ul>
         <div class="submitButton">
             <button type="submit" form="reportForm">Submit Report</button>
@@ -34,26 +34,22 @@
     <div class="form-sections">
         <div class="personal-info-wrapper">
             <div class="section-box">
-                <h2 class="section-title">Personal Information</h2>
-
-                <div class="field">
+                <h2 class="section-title">Personal Information</h2>                <div class="field">
                     <label for="name">Name (Optional)</label>
-                    <input type="text" id="name" name="owner_name">
+                    <input type="text" id="name" name="reporter_name" placeholder="Enter your full name">
                 </div>
 
                 <div class="field">
-                    <label for="contact">Contact Information</label>
-                    <input type="text" id="contact" name="owner_contact" required>
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="reporter_email" required placeholder="your.email@example.com">
                 </div>
 
                 <div class="field">
-                    <label for="road_name">Road Name</label>
-                    <input type="text" id="road_name" name="road_name" required>
-                </div>
-
-                <div class="field">
-                    <label for="address">Address</label>
-                    <input type="text" id="address" name="address" required>
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="reporter_phone" placeholder="+63 XXX XXX XXXX">
+                </div>                <div class="field">
+                    <label for="location">Location Description</label>
+                    <textarea id="location" name="location_description" required placeholder="Describe the exact location (e.g., 'Corner of Main St. and Oak Ave.', 'In front of City Hall')"></textarea>
                 </div>
             </div>
         </div>
@@ -63,74 +59,94 @@
             <div class="section-box">
                 <h2 class="section-title">Issue Details</h2>
 
-                <div class="form-card">
-
-                    <div class="form-group">
+                <div class="form-card">                    <div class="form-group">
                         <label for="issue-type">Type of Issue</label>
                         <select id="issue-type" name="issue_type" required>
                             <option value="">Select issue type</option>
-                            <option value="pothole">Pothole</option>
-                            <option value="damaged-sign">Damaged Sign</option>
-                            <option value="construction">Construction Debris</option>
-                            <option value="flooding">Road Flooding</option>
-                            <option value="traffic-light">Traffic Light Malfunction</option>
-                            <option value="other">Other</option>
+                            <option value="Pothole">Pothole</option>
+                            <option value="Road Sign Issue">Road Sign Issue</option>
+                            <option value="Damaged Road">Damaged Road</option>
+                            <option value="Flooding">Road Flooding</option>
+                            <option value="Traffic Light Issue">Traffic Light Issue</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="date-observed">Date Observed</label>
-                        <input type="date" id="date-observed" name="date_observed" required>
+                        <label for="date-occurred">Date Occurred</label>
+                        <input type="date" id="date-occurred" name="date_occurred" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="time-observed">Time Observed</label>
-                        <input type="time" id="time-observed" name="time_observed" required>
+                        <label for="time-occurred">Time Occurred</label>
+                        <input type="time" id="time-occurred" name="time_occurred" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="status">Severity Level</label>
-                        <select id="status" name="severity_level" required>
-                            <option value="">Select severity</option>
-                            <option value="low">Low - Minor inconvenience</option>
-                            <option value="medium">Medium - Moderate safety concern</option>
-                            <option value="high">High - Immediate safety hazard</option>
-                            <option value="critical">Critical - Emergency situation</option>
+                        <label for="priority">Priority Level</label>
+                        <select id="priority" name="priority" required>
+                            <option value="">Select priority</option>
+                            <option value="Low">Low - Minor inconvenience</option>
+                            <option value="Medium">Medium - Moderate safety concern</option>
+                            <option value="High">High - Immediate safety hazard</option>
+                            <option value="Critical">Critical - Emergency situation</option>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
-
-        <div class="description">
-                    <h2>Incident Description</h2>
-                    <br>
-                    <label for="incident_description">Describe the Road Issue in detail</label>
-                    <input type="text" id="incident_description" name="incident_description">
+        </div>        <div class="description">
+            <h2>Issue Description</h2>
+            <label for="description">Describe the Road Issue in Detail</label>
+            <textarea id="description" name="description" required placeholder="Please provide a detailed description of the issue, including any safety concerns or impact on traffic"></textarea>
         </div>
 
         <div class="upload-section">
-         <label for="file-input" class="upload-label">
-        <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
-        <div class="upload-icon">
-            <i class='bx bx-cloud-upload'></i>
-        </div>
-        <div class="upload-text">Upload Evidence Photos</div>
-        <div class="upload-subtext">Click here or drag and drop images (Multiple files supported)</div>
-    </label>
-</div>
-<div class="buttonContainer">
-
-    <div class="cancelButton">
-            <button type="cancelo" form="reportForm">Cancel</button>
+            <label for="file-input" class="upload-label">
+                <input type="file" id="file-input" multiple accept="image/*,video/*" style="display: none;">
+                <div class="upload-icon">
+                    <i class='bx bx-cloud-upload'></i>
+                </div>
+                <div class="upload-text">Upload Evidence Photos/Videos</div>
+                <div class="upload-subtext">Click here or drag and drop files (Multiple files supported)</div>
+            </label>
+            <div id="file-preview" class="file-preview"></div>
         </div>
 
-    <div class="submitReportButton">
-            <button type="submitReport" form="reportForm">Submit</button>
+        <div class="buttonContainer">
+            <div class="cancelButton">
+                <button type="button" id="cancelBtn">Cancel</button>
+            </div>
+            <div class="submitReportButton">
+                <button type="submit" id="submitBtn">
+                    <span class="btn-text">Submit Report</span>
+                    <div class="loading-spinner" style="display: none;">
+                        <i class='bx bx-loader-alt bx-spin'></i>
+                    </div>
+                </button>
+            </div>
         </div>
+    </form>    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class='bx bx-check-circle' style="color: #28a745;"></i>
+                <h2>Report Submitted Successfully!</h2>
+            </div>
+            <div class="modal-body">
+                <p>Your report has been submitted with ID: <strong id="reportId"></strong></p>
+                <p>Thank you for helping improve our roads! Your report has been forwarded to the relevant authorities.</p>
+                <div class="modal-actions">
+                    <button id="viewAnalyticsBtn" class="btn-primary">View Road Analytics</button>
+                    <button id="newReportBtn" class="btn-secondary">Submit Another Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-</div>
-    </form>
-</body>
-</html>
+    <!-- Supabase SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Database Service -->
+    <script src="../jscript/supabaseClient.js"></script>
+    <!-- Report Page Script -->
+    <script src="../jscript/reportPageScript.js"></script>
