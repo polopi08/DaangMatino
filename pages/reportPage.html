@@ -151,8 +151,8 @@
                     </ul>
                 </div>
                 <div class="modal-buttons">
-                    <button class="btn-primary" onclick="closeModalAndRedirect()">Go to Home</button>
-                    <button class="btn-secondary" onclick="closeModalAndReset()">Submit Another Report</button>
+                    <button class="btn-primary" onclick="closePopUpAndRedirect()">Go to Home</button>
+                    <button class="btn-secondary" onclick="closePopUpAndReset()">Submit Another Report</button>
                 </div>
             </div>
         </div>
@@ -181,14 +181,14 @@
             }
         }
         
-        function closeModalAndRedirect() {
+        function closePopUpAndRedirect() {
             document.getElementById('thankYouPopUp').style.display = 'none';
             document.body.style.overflow = 'auto';
             // Redirect to home page
             window.location.href = 'landingPage.html';
         }
         
-        function closeModalAndReset() {
+        function closePopUpAndReset() {
             document.getElementById('thankYouPopUp').style.display = 'none';
             document.body.style.overflow = 'auto';
             // Reset the form
