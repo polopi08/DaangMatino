@@ -766,4 +766,134 @@ section, footer {
   scroll-margin-top: 160px;
 }
 
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #FFD300, #FFA500);
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(255, 211, 0, 0.3);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 211, 0, 0.4);
+}
+
+/* Hamburger Menu */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 101;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: #333;
+    margin: 3px 0;
+    transition: 0.3s;
+    border-radius: 2px;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+    
+    .navbar {
+        position: fixed;
+        top: 90px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 90px);
+        background: linear-gradient(to bottom, #FAFAD2, #FFD300);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        transition: 0.3s;
+        padding-top: 50px;
+    }
+    
+    .navbar.active {
+        left: 0;
+    }
+    
+    .navbar li {
+        margin: 20px 0;
+    }
+    
+    .navbar li a {
+        font-size: 20px;
+        padding: 15px 30px;
+        border-radius: 10px;
+    }
+    
+    .reportButton {
+        margin-top: 30px;
+    }
+    
+    .reportButton button {
+        font-size: 16px;
+        padding: 12px 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .features-header p {
+        white-space: normal;
+        line-height: 1.5;
+    }
+    
+    .algorithm p {
+        white-space: normal;
+        line-height: 1.5;
+    }
+    
+    .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+}
+
 

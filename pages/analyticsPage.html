@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Road Analytics - DaangMatino</title>
+    <link rel="stylesheet" href="../assets/analyticsStyle.css">    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-cone"><i class='bx bx-traffic-cone'></i></div>
+        <div class="floating-cone"><i class='bx bx-traffic-cone'></i></div>
+        <div class="floating-cone"><i class='bx bx-traffic-cone'></i></div>
+        <div class="floating-vehicle"><i class='bx bx-truck'></i></div>
+        <div class="floating-vehicle"><i class='bx bx-van'></i></div>
+        <div class="floating-road"><i class='bx bx-traffic-barrier'></i></div>
+        <div class="floating-road"><i class='bx bx-traffic-barrier'></i></div>
+        <div class="floating-sign"><i class='bx bx-alert-triangle'></i></div>
+        <div class="floating-sign"><i class='bx bx-siren'></i></div>
+    </div>    
+    <header class="header-sticky">
+        <a href="landingPage.html" class="logo">
+            <img src="../assets/logowDAA.png" alt="Company Logo">
+            DaangMatino
+        </a>        <ul class="navbar">
+            <li><a href="landingPage.html">Home</a></li>
+            <li><a href="landingPage.html#features">Features</a></li>
+            <li><a href="analyticsPage.html" class="active">Analytics</a></li>
+            <li><a href="landingPage.html#about">About Us</a></li>
+            <li><a href="landingPage.html#contact">Contact</a></li>
+            <li><a href="maps.html">Maps</a></li>
+        </ul>
+        <div class="nav-actions">
+            <div class="reportButton">
+                <a href="reportPage.html"><button>Report Road Damage</button></a>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <section class="page-header">
+                <h1>Road Analytics Dashboard</h1>
+                <p>Priority Level Leaderboard of Reported Roads</p>
+            </section>
+
+            <!-- Statistics Overview -->
+            <section class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class='bx bx-receipt'></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalReports">0</h3>
+                        <p>Total Reports</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class='bx bx-error-circle'></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="criticalReports">0</h3>
+                        <p>Critical Issues</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class='bx bx-map'></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="affectedAreas">0</h3>
+                        <p>Areas Affected</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class='bx bx-time'></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="recentReports">0</h3>
+                        <p>This Week</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leaderboards -->
+            <section class="leaderboards">
+                <!-- Most Reported Roads -->
+                <div class="leaderboard-card">
+                    <div class="card-header">
+                        <h2><i class='bx bx-trending-up'></i> Most Reported Roads</h2>
+                        <p>Roads with the highest number of reports</p>
+                    </div>
+                    <div class="leaderboard-content">
+                        <div id="mostReportedList" class="leaderboard-list">
+                            <div class="loading">Loading data...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Most Urgent Roads -->
+                <div class="leaderboard-card">
+                    <div class="card-header">
+                        <h2><i class='bx bx-error'></i> Most Urgent Roads to Repair</h2>
+                        <p>Roads with critical and high priority issues</p>
+                    </div>
+                    <div class="leaderboard-content">
+                        <div id="mostUrgentList" class="leaderboard-list">
+                            <div class="loading">Loading data...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Issue Types Distribution -->
+                <div class="leaderboard-card">
+                    <div class="card-header">
+                        <h2><i class='bx bx-pie-chart'></i> Most Common Issues</h2>
+                        <p>Distribution of different road problems</p>
+                    </div>
+                    <div class="leaderboard-content">
+                        <div id="issueTypesList" class="leaderboard-list">
+                            <div class="loading">Loading data...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geographic Distribution -->
+                <div class="leaderboard-card">
+                    <div class="card-header">
+                        <h2><i class='bx bx-map-pin'></i> Most Affected Areas</h2>
+                        <p>Areas with the most road repair needs</p>
+                    </div>
+                    <div class="leaderboard-content">
+                        <div id="affectedAreasList" class="leaderboard-list">
+                            <div class="loading">Loading data...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity">
+                <div class="activity-header">
+                    <h2>Recent Reports</h2>
+                    <button id="refreshBtn" class="refresh-btn">
+                        <i class='bx bx-refresh'></i> Refresh
+                    </button>
+                </div>
+                <div class="activity-list" id="recentActivity">
+                    <div class="loading">Loading recent activity...</div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DaangMatino</h3>
+                    <p>Improving road safety through community reporting</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="landingPage.html">Home</a></li>
+                        <li><a href="reportPage.html">Report Issue</a></li>
+                        <li><a href="analyticsPage.html">Analytics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: support@daangmatino.com</p>
+                    <p>Phone: (555) 123-4567</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DaangMatino. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Database Service -->
+    <script src="../jscript/supabaseClient.js"></script>
+    <!-- Analytics Script -->
+    <script src="../jscript/analyticsScript.js"></script>
+</body>
+</html>

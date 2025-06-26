@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DaangMatino Admin Dashboard - Road maintenance tracking and reporting system">
     <title>Admin Dashboard | John Paul Tamares</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../assets/adminPageStyle.css">
 </head>
 <body>
-    <header>
-        <a href="#" class="logo">
+    <header class="admin-header-simple">
+        <a href="landingPage.html" class="logo">
             <img src="../assets/logowDAA.png" alt="Company Logo">
-            WELCOME, ADMIN!
+            <span>WELCOME, ADMIN!</span>
         </a>
     </header>
 
@@ -20,48 +21,23 @@
         <div class="left-section">
             <div class="total-reports">
                 <h2>Total Reports</h2>
-                <div class="report-number">10</div>
+                <div class="report-number">7</div>
             </div>
-
             <div class="chart-section">
-                <h3>Reports by Location</h3>
+                <h3>Reports by Priority</h3>
                 <div class="chart-container">
-                    <svg class="pie-chart" viewBox="0 0 200 200" width="200" height="200">
-                        <!-- Teresa (50%) -->
-                        <circle cx="100" cy="100" r="80" fill="none" stroke="#dc3545" stroke-width="20"
-                                stroke-dasharray="251.2 251.2" stroke-dashoffset="0" transform="rotate(-90 100 100)"></circle>
-                        
-                        <!-- Pueza (30%) -->
-                        <circle cx="100" cy="100" r="80" fill="none" stroke="#fd7e14" stroke-width="20"
-                                stroke-dasharray="150.7 150.7" stroke-dashoffset="-251.2" transform="rotate(-90 100 100)"></circle>
-                        
-                        <!-- Aronas (20%) -->
-                        <circle cx="100" cy="100" r="80" fill="none" stroke="#ffc107" stroke-width="20"
-                                stroke-dasharray="100.5 100.5" stroke-dashoffset="-401.9" transform="rotate(-90 100 100)"></circle>
-                    </svg>
-                    
-                    <div class="chart-legend">
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #dc3545;"></span>
-                            <span class="legend-text">Teresa (50%)</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #fd7e14;"></span>
-                            <span class="legend-text">Pueza (30%)</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #ffc107;"></span>
-                            <span class="legend-text">Aronas (20%)</span>
-                        </div>
+                    <div id="pieChartContainer">
                     </div>
+                </div>
+                <div id="pieChartHoverLabel" class="pie-chart-hover-label">
+                    Hover over a slice to see details
                 </div>
             </div>
         </div>
-
         <div class="summary-section">
             <div class="summary-card">
-                <h3>Summary of Reports as of 6/13/25</h3>
-                
+                <h3>Summary of Reports as of <span id="currentDate"></span></h3>
+
                 <div class="table-container">
                     <table class="reports-table">
                         <thead>
@@ -71,76 +47,147 @@
                                 <th>Type of Road</th>
                                 <th>Severity</th>
                                 <th>Type of Defect</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="reportsTableBody">
                             <tr>
-                                <td>
-                                    <span class="priority-badge priority-1">1</span>
-                                </td>
-                                <td>Teresa Municipal</td>
-                                <td>Municipal</td>
-                                <td>
-                                    <span class="severity-badge severity-high">
-                                        <i class='bx bx-error'></i>
-                                        High
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="defect-info">
-                                        <strong>Manhole</strong>
-                                        <span class="defect-detail">Cover Missing</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="priority-badge priority-2">2</span>
-                                </td>
-                                <td>Pueza Municipal</td>
-                                <td>Municipal</td>
-                                <td>
-                                    <span class="severity-badge severity-medium">
-                                        <i class='bx bx-construction'></i>
-                                        Medium
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="defect-info">
-                                        <strong>Crack</strong>
-                                        <span class="defect-detail">Surface Damage</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="priority-badge priority-3">3</span>
-                                </td>
-                                <td>Aronas Municipal</td>
-                                <td>Municipal</td>
-                                <td>
-                                    <span class="severity-badge severity-low">
-                                        <i class='bx bx-construction'></i>
-                                        Low
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="defect-info">
-                                        <strong>Pothole</strong>
-                                        <span class="defect-detail">Deep Depression</span>
+                                <td colspan="6" class="loading-row">
+                                    <div class="loading-spinner">
+                                        <i class='bx bx-loader-alt bx-spin'></i>
+                                        Loading reports from database...
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="view-all-container">
-                    <button class="view-all-btn">View All Reports</button>
+                    <button class="view-all-btn" title="View complete report list" onclick="loadAllReports()">
+                        <i class='bx bx-list-ul'></i> View All Reports
+                    </button>
                 </div>
             </div>
         </div>
-
     </main>
+
+    <section class="analytics-dashboard">
+        <div class="container">
+            <div class="analytics-header">
+                <h2><i class='bx bx-bar-chart-alt-2'></i> Road Analytics Dashboard</h2>
+                <p>Comprehensive insights and leaderboards for road maintenance planning</p>
+            </div>
+
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class='bx bx-receipt'></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalReports">0</h3>
+                        <p>Total Reports</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class='bx bx-error-circle'></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="criticalReports">0</h3>
+                        <p>Critical Issues</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class='bx bx-map'></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="affectedAreas">0</h3>
+                        <p>Areas Affected</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class='bx bx-time'></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="recentReports">0</h3>
+                        <p>This Week</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="leaderboards">
+                <div class="leaderboard-card">
+                    <div class="card-header">
+                        <h3><i class='bx bx-trending-up'></i> Most Reported Roads</h3>
+                        <p>Roads with the highest number of reports</p>
+                    </div>
+                    <div class="leaderboard-content">
+                        <div id="mostReportedList" class="leaderboard-list">
+                            <div class="loading">Loading data...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="leaderboard-card">
+                    <div class="card-header">
+                        <h3><i class='bx bx-error'></i> Most Urgent Roads to Repair</h3>
+                        <p>Roads with critical and high priority issues</p>
+                    </div>
+                    <div class="leaderboard-content">
+                        <div id="mostUrgentList" class="leaderboard-list">
+                            <div class="loading">Loading data...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="leaderboard-card">
+                    <div class="card-header">
+                        <h3><i class='bx bx-pie-chart'></i> Most Common Issues</h3>
+                        <p>Distribution of different road problems</p>
+                    </div>
+                    <div class="leaderboard-content">
+                        <div id="issueTypesList" class="leaderboard-list">
+                            <div class="loading">Loading data...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="leaderboard-card">
+                    <div class="card-header">
+                        <h3><i class='bx bx-map-pin'></i> Most Affected Areas</h3>
+                        <p>Areas with the most road repair needs</p>
+                    </div>
+                    <div class="leaderboard-content">
+                        <div id="affectedAreasList" class="leaderboard-list">
+                            <div class="loading">Loading data...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <div class="activity-header">
+                    <h3>Recent Reports</h3>
+                    <button id="refreshBtn" class="refresh-btn">
+                        <i class='bx bx-refresh'></i> Refresh
+                    </button>
+                </div>
+                <div class="activity-list" id="recentActivity">
+                    <div class="loading">Loading recent activity...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="admin-footer">
+        <p>&copy; 2025 DaangMatino Admin Dashboard</p>
+    </footer>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../jscript/supabaseClient.js"></script>
+    <script src="../jscript/analyticsScript.js"></script>
+    <script src="../jscript/adminPageScript.js"></script>
 </body>
 </html>
