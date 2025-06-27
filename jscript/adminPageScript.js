@@ -109,11 +109,11 @@ async function loadReportsTable(limit = 10) {
         
         console.log(`Processing ${reports.length} reports for table display`);
         
-        // Sort reports by priority (1 = highest priority)
+        // Sort reports by severity (critical = highest priority)
         const sortedReports = reports
             .sort((a, b) => {
-                const priorityA = getPriorityValue(a.priority);
-                const priorityB = getPriorityValue(b.priority);
+                const priorityA = getSeverityValue(a.severity);
+                const priorityB = getSeverityValue(b.severity);
                 return priorityA - priorityB;
             })
             .slice(0, limit);
@@ -121,17 +121,16 @@ async function loadReportsTable(limit = 10) {
         console.log(`Displaying ${sortedReports.length} reports in table`);
         
         const tableRows = sortedReports.map((report, index) => {
-            const priority = getPriorityValue(report.priority);
-            const roadName = report.road || report.location_description || report.location || `Report ${index + 1}`;
+            const severityValue = getSeverityValue(report.severity);
+            const roadName = report.road_name || report.location_description || report.location || `Report ${index + 1}`;
             const roadType = report.road_type || 'Municipal';
-            const severity = determineSeverity(report);
-            const defectType = report.damage_type || report.issue_type || 'Road Issue';
-            const defectDetail = report.description || 'Needs attention';
+            const severity = report.severity || 'medium';
+            const defectType = Array.isArray(report.defects) ? report.defects.join(', ') : (report.defects || 'Road Issue');
             
             return `
                 <tr>
                     <td>
-                        <span class="priority-badge priority-${priority}">${priority}</span>
+                        <span class="priority-badge priority-${severityValue}">${severityValue}</span>
                     </td>
                     <td>${roadName}</td>
                     <td>${roadType}</td>
@@ -144,7 +143,6 @@ async function loadReportsTable(limit = 10) {
                     <td>
                         <div class="defect-info">
                             <strong>${defectType}</strong>
-                            <span class="defect-detail">${defectDetail.substring(0, 50)}${defectDetail.length > 50 ? '...' : ''}</span>
                         </div>
                     </td>
                     <td>
@@ -205,17 +203,17 @@ async function loadPieChart() {
             return;
         }
         
-        // Group reports by priority
-        const priorityGroups = {};
+        // Group reports by severity
+        const severityGroups = {};
         reports.forEach(report => {
-            const priority = getPriorityValue(report.priority);
-            priorityGroups[priority] = (priorityGroups[priority] || 0) + 1;
+            const severity = report.severity || 'medium';
+            severityGroups[severity] = (severityGroups[severity] || 0) + 1;
         });
         
-        const chartData = Object.entries(priorityGroups).map(([priority, count]) => ({
-            label: `Priority ${priority}`,
+        const chartData = Object.entries(severityGroups).map(([severity, count]) => ({
+            label: `${severity.charAt(0).toUpperCase() + severity.slice(1)} Severity`,
             value: count,
-            color: getPriorityColor(priority)
+            color: getSeverityColor(severity)
         }));
         
         // Generate pie chart
@@ -341,55 +339,34 @@ function createPieSlice(centerX, centerY, radius, startAngle, endAngle) {
     return path;
 }
 
-// Helper function to convert priority string to number
-function getPriorityValue(priority) {
-    if (typeof priority === 'number') return priority;
-    
-    const priorityStr = (priority || '').toLowerCase();
-    switch (priorityStr) {
-        case 'critical':
-        case 'urgent':
-            return 1;
+// Helper function to convert severity string to number for sorting
+function getSeverityValue(severity) {
+    const severityStr = (severity || '').toLowerCase();
+    switch (severityStr) {
         case 'high':
-            return 2;
+            return 1; // Highest priority
         case 'medium':
-            return 3;
+            return 2;
         case 'low':
-            return 4;
+            return 3;
         default:
-            return 5;
+            return 4;
     }
 }
 
-// Get color for priority level
-function getPriorityColor(priority) {
+// Get color for severity level
+function getSeverityColor(severity) {
     const colors = {
-        '1': '#dc3545', // Red for highest priority
-        '2': '#fd7e14', // Orange
-        '3': '#ffc107', // Yellow
-        '4': '#28a745', // Green
-        '5': '#6c757d'  // Gray for lowest priority
+        'high': '#dc3545',    // Red for high severity
+        'medium': '#ffc107',  // Yellow for medium severity
+        'low': '#28a745'      // Green for low severity
     };
-    return colors[priority] || '#6c757d';
+    return colors[severity.toLowerCase()] || '#6c757d';
 }
 
-// Helper function to determine severity based on report data
+// Helper function to determine severity based on report data (this is now redundant since severity is stored directly)
 function determineSeverity(report) {
-    const priority = getPriorityValue(report.priority);
-    const damageType = (report.damage_type || report.issue_type || '').toLowerCase();
-    
-    // High priority or dangerous damage types
-    if (priority <= 2 || damageType.includes('manhole') || damageType.includes('critical') || damageType.includes('dangerous') || damageType.includes('traffic light')) {
-        return 'High';
-    }
-    // Medium priority
-    else if (priority <= 3 || damageType.includes('crack') || damageType.includes('medium') || damageType.includes('damaged road')) {
-        return 'Medium';
-    }
-    // Low priority
-    else {
-        return 'Low';
-    }
+    return report.severity || 'medium';
 }
 
 // Helper function to get severity description
@@ -462,7 +439,7 @@ async function deleteReport(reportId) {
             
             // Use Supabase directly for deletion
             const { error } = await supabase
-                .from('reports')
+                .from('road_reports')
                 .delete()
                 .eq('id', reportId);
 

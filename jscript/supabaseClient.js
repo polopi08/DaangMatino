@@ -4,9 +4,7 @@ const SUPABASE_URL = 'https://rnbmogqzheqzztkpwnif.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuYm1vZ3F6aGVxenp0a3B3bmlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2NTkzNjYsImV4cCI6MjA2NjIzNTM2Nn0.AFcODs36IuVEl2R5nWGgQGKU8ruqufUuvk_Qq-DfD14';
 
 // Check if Supabase is properly configured
-const isSupabaseConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && 
-                            SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY' &&
-                            SUPABASE_URL.includes('supabase.co') &&
+const isSupabaseConfigured = SUPABASE_URL.includes('supabase.co') && 
                             SUPABASE_ANON_KEY.length > 20;
 
 let supabase = null;
@@ -66,13 +64,12 @@ class DatabaseService {
             demo: true,
             data: {
                 total: 15,
-                byPriority: {
-                    'critical': 2,
-                    'high': 5,
+                bySeverity: {
+                    'high': 7,
                     'medium': 6,
                     'low': 2
                 },
-                byIssueType: {
+                byDefects: {
                     'Pothole': 6,
                     'Damaged Road': 4,
                     'Flooding': 3,
@@ -90,93 +87,79 @@ class DatabaseService {
                 {
                     id: 1,
                     public_id: 'RPT-000001',
-                    issue_type: 'Pothole',
-                    priority: 'High',
-                    priority_value: 2,
+                    defects: ['Pothole'],
+                    severity: 'High',
                     location_description: 'Corner of Main St. and Oak Ave.',
-                    description: 'Large pothole causing traffic hazard',
                     created_at: new Date().toISOString(),
                     reporter_name: 'John Doe',
-                    road_type: 'Municipal',
-                    damage_type: 'Pothole'
+                    road_name: 'Main Street',
+                    road_type: 'Municipal'
                 },
                 {
                     id: 2,
                     public_id: 'RPT-000002',
-                    issue_type: 'Damaged Road',
-                    priority: 'Medium',
-                    priority_value: 3,
+                    defects: ['Damaged Road'],
+                    severity: 'Medium',
                     location_description: 'Highway 101 near Exit 15',
-                    description: 'Cracked pavement surface',
                     created_at: new Date(Date.now() - 86400000).toISOString(),
                     reporter_name: 'Jane Smith',
-                    road_type: 'National',
-                    damage_type: 'Crack'
+                    road_name: 'Highway 101',
+                    road_type: 'National'
                 },
                 {
                     id: 3,
                     public_id: 'RPT-000003',
-                    issue_type: 'Traffic Light Issue',
-                    priority: 'Critical',
-                    priority_value: 1,
+                    defects: ['Traffic Light Issue'],
+                    severity: 'High',
                     location_description: 'Intersection of First St. and Broadway',
-                    description: 'Traffic light not functioning properly',
                     created_at: new Date(Date.now() - 172800000).toISOString(),
                     reporter_name: null,
-                    road_type: 'Municipal',
-                    damage_type: 'Traffic Signal'
+                    road_name: 'First Street',
+                    road_type: 'Municipal'
                 },
                 {
                     id: 4,
                     public_id: 'RPT-000004',
-                    issue_type: 'Flooding',
-                    priority: 'High',
-                    priority_value: 2,
+                    defects: ['Flooding'],
+                    severity: 'High',
                     location_description: 'Downtown Bridge Area',
-                    description: 'Road flooding during rain',
                     created_at: new Date(Date.now() - 259200000).toISOString(),
                     reporter_name: 'Mike Wilson',
-                    road_type: 'Provincial',
-                    damage_type: 'Drainage Issue'
+                    road_name: 'Downtown Bridge',
+                    road_type: 'Provincial'
                 },
                 {
                     id: 5,
                     public_id: 'RPT-000005',
-                    issue_type: 'Damaged Road',
-                    priority: 'Low',
-                    priority_value: 4,
+                    defects: ['Damaged Road'],
+                    severity: 'Low',
                     location_description: 'Residential Lane 5',
-                    description: 'Minor surface wear',
                     created_at: new Date(Date.now() - 345600000).toISOString(),
                     reporter_name: 'Sarah Davis',
-                    road_type: 'Municipal',
-                    damage_type: 'Surface Wear'
+                    road_name: 'Residential Lane 5',
+                    road_type: 'Municipal'
                 },
                 {
                     id: 6,
                     public_id: 'RPT-000006',
-                    issue_type: 'Pothole',
-                    priority: 'Critical',
-                    priority_value: 1,
+                    defects: ['Pothole'],
+                    severity: 'High',
                     location_description: 'Main Highway Intersection',
-                    description: 'Dangerous pothole at busy intersection',
                     created_at: new Date(Date.now() - 432000000).toISOString(),
                     reporter_name: 'Emergency Services',
-                    road_type: 'National',
-                    damage_type: 'Pothole'
+                    road_name: 'Main Highway',
+                    road_type: 'National'
                 },
                 {
                     id: 7,
                     public_id: 'RPT-000007',
-                    issue_type: 'Road Marking',
-                    priority: 'Medium',
-                    priority_value: 3,
+                    defects: ['Road Marking'],
+                    severity: 'Medium',
                     location_description: 'School Zone Area',
-                    description: 'Faded road markings near school',
                     created_at: new Date(Date.now() - 518400000).toISOString(),
                     reporter_name: 'School Principal',
-                    road_type: 'Municipal',
-                    damage_type: 'Road Marking'
+                    road_name: 'School Zone',
+                    road_type: 'Municipal'
                 }
             ]
         };
@@ -184,60 +167,64 @@ class DatabaseService {
 
     // Reports operations
     static async createReport(reportData) {
-        console.log('📝 Creating report with data:', reportData);
-        
-        if (!this.isAvailable()) {
-            // Demo mode - simulate successful creation
-            console.log('📝 Demo mode: Report would be created with data:', reportData);
-            return {
-                success: true,
-                data: {
-                    id: Math.floor(Math.random() * 1000) + 1,
-                    public_id: `RPT-${String(Math.floor(Math.random() * 1000) + 1).padStart(6, '0')}`,
-                    ...reportData,
-                    created_at: new Date().toISOString()
-                },
-                demo: true
-            };
-        }
-
-        try {
-            console.log('🔄 Attempting to insert report into Supabase...');
-            
-            const { data, error } = await supabase
-                .from('reports')
-                .insert([{
-                    reporter_name: reportData.reporterName,
-                    reporter_email: reportData.reporterEmail,
-                    reporter_phone: reportData.reporterPhone,
-                    issue_type: reportData.issueType,
-                    date_occurred: reportData.dateOccurred,
-                    time_occurred: reportData.timeOccurred,
-                    priority: reportData.priority,
-                    location_description: reportData.locationDescription,
-                    description: reportData.description
-                }])
-                .select();
-
-            if (error) {
-                console.error('❌ Supabase insert error:', error);
-                console.error('Error details:', {
-                    code: error.code,
-                    message: error.message,
-                    details: error.details,
-                    hint: error.hint
-                });
-                throw error;
-            }
-            
-            console.log('✅ Report created successfully:', data[0]);
-            return { success: true, data: data[0] };
-        } catch (error) {
-            console.error('❌ Error creating report:', error);
-            console.error('Full error object:', error);
-            return { success: false, error: error.message };
-        }
+    console.log('📝 Creating report with data:', reportData);
+    
+    if (!this.isAvailable()) {
+        throw new Error('Database service not available');
     }
+
+    try {
+        // Convert defects string to array if needed
+        let defectsArray;
+        if (typeof reportData.defects === 'string') {
+            // Split comma-separated string into array and trim whitespace
+            defectsArray = reportData.defects.split(',').map(item => item.trim());
+        } else if (Array.isArray(reportData.defects)) {
+            defectsArray = reportData.defects;
+        } else {
+            defectsArray = [];
+        }
+
+        const dbData = {
+            road_name: reportData.roadName || reportData.road_name || '',
+            road_type: reportData.roadType || reportData.road_type || 'unknown',
+            defects: defectsArray, // Now properly formatted as array
+            severity: reportData.severity || 'medium',
+            description: reportData.description || '',
+            latitude: reportData.latitude || null,
+            longitude: reportData.longitude || null,
+            response_time: reportData.responseTime || null,
+            severity_score: reportData.severityScore || 50,
+            report_count: 1
+        };
+
+        console.log('🔄 Attempting to insert report into Supabase...');
+        console.log('📋 Formatted data for database:', dbData);
+        
+        const { data, error } = await supabase
+            .from('road_reports')
+            .insert([dbData])
+            .select('*');
+
+        if (error) {
+            console.error('❌ Supabase insert error:', error);
+            console.error('Error details:', error);
+            throw error;
+        }
+
+        if (!data || data.length === 0) {
+            throw new Error('No data returned from insert operation');
+        }
+
+        console.log('✅ Report saved to database successfully:', data[0]);
+        return { success: true, data: data[0] };
+        
+    } catch (error) {
+        console.error('❌ Error creating report:', error);
+        console.error('Full error object:', error);
+        throw error;
+    }
+}
 
     static async getAllReports() {
         if (!this.isAvailable()) {
@@ -248,7 +235,7 @@ class DatabaseService {
 
         try {
             const { data, error } = await supabase
-                .from('reports')
+                .from('road_reports')
                 .select('*')
                 .order('created_at', { ascending: false });
 
@@ -267,7 +254,7 @@ class DatabaseService {
 
         try {
             const { data, error } = await supabase
-                .from('reports')
+                .from('road_reports')
                 .select('*')
                 .eq('id', id)
                 .single();
@@ -287,7 +274,7 @@ class DatabaseService {
 
         try {
             const { data, error } = await supabase
-                .from('reports')
+                .from('road_reports')
                 .select('*')
                 .eq('public_id', publicId)
                 .single();
@@ -542,6 +529,34 @@ class DatabaseService {
         }
     }
 
+    // Delete a report
+    static async deleteReport(reportId) {
+        if (!this.isAvailable()) {
+            return this.showConfigMessage();
+        }
+
+        try {
+            console.log('🔄 Attempting to delete report from Supabase...');
+            
+            const { data, error } = await supabase
+                .from('road_reports')
+                .delete()
+                .eq('id', reportId)
+                .select();
+
+            if (error) {
+                console.error('❌ Supabase delete error:', error);
+                throw error;
+            }
+            
+            console.log('✅ Report deleted successfully:', data);
+            return { success: true, data: data };
+        } catch (error) {
+            console.error('❌ Error deleting report:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     // Utility functions
     static generateAccessToken() {
         return 'TKN-' + Math.random().toString(36).substr(2, 12).toUpperCase();
@@ -557,15 +572,15 @@ class DatabaseService {
 
         try {
             const { data, error } = await supabase
-                .from('reports')
-                .select('priority, issue_type, created_at');
+                .from('road_reports')
+                .select('severity, defects, created_at');
 
             if (error) throw error;
 
             const stats = {
                 total: data.length,
-                byPriority: this.groupBy(data, 'priority'),
-                byIssueType: this.groupBy(data, 'issue_type'),
+                bySeverity: this.groupBy(data, 'severity'),
+                byDefects: this.groupByDefects(data), // Special handling for defects array
                 recent: data.filter(report => {
                     const reportDate = new Date(report.created_at);
                     const weekAgo = new Date();
@@ -583,6 +598,22 @@ class DatabaseService {
         return array.reduce((result, item) => {
             const group = item[key]?.toLowerCase() || 'unknown';
             result[group] = (result[group] || 0) + 1;
+            return result;
+        }, {});
+    }
+
+    static groupByDefects(array) {
+        return array.reduce((result, item) => {
+            const defects = item.defects || [];
+            // Handle case where defects might be stored as a string
+            const defectsArray = Array.isArray(defects) ? defects : [defects];
+            
+            defectsArray.forEach(defect => {
+                if (defect && defect.trim()) {
+                    const group = defect.toLowerCase();
+                    result[group] = (result[group] || 0) + 1;
+                }
+            });
             return result;
         }, {});
     }

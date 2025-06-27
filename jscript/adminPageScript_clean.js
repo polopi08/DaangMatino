@@ -5,14 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize dashboard
     initializeDashboard();
-    
-    // View all reports button click handler
-    const viewAllBtn = document.querySelector('.view-all-btn');
-    if (viewAllBtn) {
-        viewAllBtn.addEventListener('click', function() {
-            loadAllReports();
-        });
-    }
+
 
     // Add interaction to the pie chart
     const chartSegments = document.querySelectorAll('.pie-chart circle');

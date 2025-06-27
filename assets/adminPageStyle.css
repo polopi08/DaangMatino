@@ -1130,10 +1130,6 @@ header {
     margin: 0;
 }
 
-.summary-card .view-all-container {
-    padding: 0 25px 25px 25px;
-}
-
 button.delete-btn {
     background-color: #dc3545 !important;
     color: white !important;

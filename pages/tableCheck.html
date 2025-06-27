@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Table Check</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Database Table Structure Check</h1>
+    <button onclick="checkRoadReports()">Check road_reports table</button>
+    <button onclick="checkReports()">Check reports table</button>
+    <button onclick="testSimpleInsert()">Test Simple Insert</button>
+    
+    <div id="results"></div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../jscript/supabaseClient.js"></script>
+    
+    <script>
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        async function checkRoadReports() {
+            addResult('Checking road_reports table...', 'info');
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('road_reports')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) {
+                    addResult(`❌ road_reports table error: ${error.message}`, 'error');
+                    addResult(`Error code: ${error.code}`, 'error');
+                } else {
+                    addResult(`✅ road_reports table exists`, 'success');
+                    if (data && data.length > 0) {
+                        addResult(`Sample record: <pre>${JSON.stringify(data[0], null, 2)}</pre>`, 'info');
+                        addResult(`Available columns: ${Object.keys(data[0]).join(', ')}`, 'info');
+                    } else {
+                        addResult(`Table is empty`, 'info');
+                    }
+                }
+            } catch (error) {
+                addResult(`❌ Connection error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkReports() {
+            addResult('Checking reports table...', 'info');
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('reports')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) {
+                    addResult(`❌ reports table error: ${error.message}`, 'error');
+                } else {
+                    addResult(`✅ reports table exists`, 'success');
+                    if (data && data.length > 0) {
+                        addResult(`Sample record: <pre>${JSON.stringify(data[0], null, 2)}</pre>`, 'info');
+                        addResult(`Available columns: ${Object.keys(data[0]).join(', ')}`, 'info');
+                    }
+                }
+            } catch (error) {
+                addResult(`❌ Connection error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSimpleInsert() {
+            addResult('Testing simple insert into road_reports...', 'info');
+            
+            try {
+                // Try with minimal data first
+                const { data, error } = await window.supabaseClient
+                    .from('road_reports')
+                    .insert([{
+                        description: 'Test report - ' + new Date().toISOString()
+                    }])
+                    .select();
+                
+                if (error) {
+                    addResult(`❌ Simple insert failed: ${error.message}`, 'error');
+                    addResult(`Error details: <pre>${JSON.stringify(error, null, 2)}</pre>`, 'error');
+                } else {
+                    addResult(`✅ Simple insert successful!`, 'success');
+                    addResult(`Inserted: <pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+                }
+            } catch (error) {
+                addResult(`❌ Exception: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

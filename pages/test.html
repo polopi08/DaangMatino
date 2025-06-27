@@ -25,6 +25,7 @@
         <div class="nav-actions">
             <div class="reportButton">
                 <a href="landingPage.html"><button>Back to Home</button></a> 
+                <a href="adminPage.html"><button>Admin Dashboard</button></a>
             </div>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -42,9 +43,6 @@
             </div>
             <div class="tab" onclick="switchTab('analysis')">
                 🔬 Analysis & Prioritization
-            </div>
-            <div class="tab" onclick="switchTab('routes')">
-                🗺️ Maintenance Visualization
             </div>
         </div>
 
@@ -74,7 +72,6 @@
                     <div class="input-group">
                         <label for="severity">Severity Level</label>
                         <select id="severity">
-                            <option value="critical">Critical (Immediate danger)</option>
                             <option value="high">High (Major disruption)</option>
                             <option value="medium">Medium (Moderate impact)</option>
                             <option value="low">Low (Minor issue)</option>
@@ -129,13 +126,6 @@
                     <div id="map"></div>
                 </div>
 
-                <div class="input-group" style="margin-top: 20px">
-                    <label for="description">Additional Description</label>
-                    <textarea
-                        id="description"
-                        placeholder="Describe the road condition, location landmarks, and any additional details..."
-                    ></textarea>
-                </div>
                 <button
                     class="btn-primary"
                     onclick="submitReport()"
@@ -166,12 +156,13 @@
                             <th>Response Time</th>
                             <th>Reports Count</th>
                             <th>Severity Score</th>
+                            <th>Date Created</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="reportsBody">
                         <tr>
-                            <td colspan="8" class="empty-state">
+                            <td colspan="9" class="empty-state">
                                 No reports submitted yet. Be the first to report a road
                                 defect!
                             </td>
@@ -261,266 +252,12 @@
                 Run the DaangMatino analysis first to generate maintenance schedules.
             </div>
         </div>
-
-        <!-- Routes Tab - Replaced with Visualization -->
-        <div id="routes-tab" class="tab-content">
-            <div class="visualization-container">
-                <div class="visualization-header">
-                    <h1><i class="fas fa-road"></i> Road Network Maintenance</h1>
-                    <p class="subtitle">
-                        Visualize road availability during maintenance period
-                    </p>
-                </div>
-
-                <div class="visualization-content">
-                    <div class="dashboard">
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title">Road Network Visualization</h2>
-                                <div class="card-icon">
-                                    <i class="fas fa-map"></i>
-                                </div>
-                            </div>
-                            <div id="network-map"></div>
-
-                            <div class="slider-container">
-                                <div class="slider-header">
-                                    <h3>Adjust Maintenance Day</h3>
-                                    <div class="day-display">
-                                        Day <span id="current-day">15</span> of 30
-                                    </div>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="30"
-                                    value="15"
-                                    class="slider"
-                                    id="day-slider"
-                                />
-                                <div class="legend">
-                                    <div class="legend-item">
-                                        <div
-                                            class="legend-color"
-                                            style="background-color: #2ed573"
-                                        ></div>
-                                        <span>Available</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div
-                                            class="legend-color"
-                                            style="background-color: #ffa502"
-                                        ></div>
-                                        <span>In Maintenance</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div
-                                            class="legend-color"
-                                            style="background-color: #ff4757"
-                                        ></div>
-                                        <span>Not Accessible</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="road-stats">
-                                <div class="stat-card">
-                                    <div>
-                                        <i
-                                            class="fas fa-road"
-                                            style="color: #2ed573; font-size: 1.8rem"
-                                        ></i>
-                                    </div>
-                                    <div class="stat-value" id="available-roads">18</div>
-                                    <div class="stat-label">Available Roads</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div>
-                                        <i
-                                            class="fas fa-tools"
-                                            style="color: #ffa502; font-size: 1.8rem"
-                                        ></i>
-                                    </div>
-                                    <div class="stat-value" id="maintenance-roads">5</div>
-                                    <div class="stat-label">In Maintenance</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div>
-                                        <i
-                                            class="fas fa-exclamation-triangle"
-                                            style="color: #ff4757; font-size: 1.8rem"
-                                        ></i>
-                                    </div>
-                                    <div class="stat-value" id="blocked-roads">7</div>
-                                    <div class="stat-label">Blocked Roads</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title">Road Maintenance Schedule</h2>
-                                <div class="card-icon">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                            </div>
-                            <div class="road-list" id="visualization-road-list">
-                                <div class="road-item-vis">
-                                    <div>
-                                        <span class="road-status status-completed"></span>
-                                        <span class="road-name">National Highway 1</span>
-                                    </div>
-                                    <div class="road-days">Days 1-7</div>
-                                </div>
-                                <div class="road-item-vis">
-                                    <div>
-                                        <span class="road-status status-completed"></span>
-                                        <span class="road-name">Municipal Road B</span>
-                                    </div>
-                                    <div class="road-days">Days 3-10</div>
-                                </div>
-                                <div class="road-item-vis">
-                                    <div>
-                                        <span class="road-status status-completed"></span>
-                                        <span class="road-name">Bypass Road East</span>
-                                    </div>
-                                    <div class="road-days">Days 5-12</div>
-                                </div>
-                                <div class="road-item-vis">
-                                    <div>
-                                        <span class="road-status status-active"></span>
-                                        <span class="road-name">Barangay Access Road</span>
-                                    </div>
-                                    <div class="road-days">Days 10-18</div>
-                                </div>
-                                <div class="road-item-vis">
-                                    <div>
-                                        <span class="road-status status-active"></span>
-                                        <span class="road-name">National Highway 2</span>
-                                    </div>
-                                    <div class="road-days">Days 12-20</div>
-                                </div>
-                                <div class="road-item-vis">
-                                    <div>
-                                        <span class="road-status status-pending"></span>
-                                        <span class="road-name">Municipal Road C</span>
-                                    </div>
-                                    <div class="road-days">Days 18-25</div>
-                                </div>
-                                <div class="road-item-vis">
-                                    <div>
-                                        <span class="road-status status-pending"></span>
-                                        <span class="road-name">Barangay Service Road</span>
-                                    </div>
-                                    <div class="road-days">Days 20-27</div>
-                                </div>
-                                <div class="road-item-vis">
-                                    <div>
-                                        <span class="road-status status-pending"></span>
-                                        <span class="road-name">Bypass Road West</span>
-                                    </div>
-                                    <div class="road-days">Days 22-30</div>
-                                </div>
-                            </div>
-
-                            <div class="card-header" style="margin-top: 20px">
-                                <h2 class="card-title">Maintenance Summary</h2>
-                            </div>
-                            <div class="road-stats">
-                                <div class="stat-card">
-                                    <div>
-                                        <i
-                                            class="fas fa-check-circle"
-                                            style="color: #2ed573; font-size: 1.8rem"
-                                        ></i>
-                                    </div>
-                                    <div class="stat-value">3</div>
-                                    <div class="stat-label">Completed</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div>
-                                        <i
-                                            class="fas fa-tools"
-                                            style="color: #ffa502; font-size: 1.8rem"
-                                        ></i>
-                                    </div>
-                                    <div class="stat-value">2</div>
-                                    <div class="stat-label">In Progress</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div>
-                                        <i
-                                            class="fas fa-clock"
-                                            style="color: #3498db; font-size: 1.8rem"
-                                        ></i>
-                                    </div>
-                                    <div class="stat-value">3</div>
-                                    <div class="stat-label">Upcoming</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="timeline">
-                        <div class="timeline-header">
-                            <h2 class="timeline-title">Maintenance Timeline</h2>
-                            <div class="day-display">
-                                Day <span id="timeline-day">15</span> of 30
-                            </div>
-                        </div>
-                        <div class="timeline-steps">
-                            <div class="timeline-step">
-                                <div class="step-day">Day 1-7</div>
-                                <div class="step-road">National Highway 1</div>
-                                <div class="step-status status-complete">Completed</div>
-                            </div>
-                            <div class="timeline-step">
-                                <div class="step-day">Day 3-10</div>
-                                <div class="step-road">Municipal Road B</div>
-                                <div class="step-status status-complete">Completed</div>
-                            </div>
-                            <div class="timeline-step">
-                                <div class="step-day">Day 5-12</div>
-                                <div class="step-road">Bypass Road East</div>
-                                <div class="step-status status-complete">Completed</div>
-                            </div>
-                            <div class="timeline-step">
-                                <div class="step-day">Day 10-18</div>
-                                <div class="step-road">Barangay Access Road</div>
-                                <div class="step-status status-in-progress">In Progress</div>
-                            </div>
-                            <div class="timeline-step">
-                                <div class="step-day">Day 12-20</div>
-                                <div class="step-road">National Highway 2</div>
-                                <div class="step-status status-in-progress">In Progress</div>
-                            </div>
-                            <div class="timeline-step">
-                                <div class="step-day">Day 18-25</div>
-                                <div class="step-road">Municipal Road C</div>
-                                <div class="step-status status-planned">Planned</div>
-                            </div>
-                            <div class="timeline-step">
-                                <div class="step-day">Day 20-27</div>
-                                <div class="step-road">Barangay Service Road</div>
-                                <div class="step-status status-planned">Planned</div>
-                            </div>
-                            <div class="timeline-step">
-                                <div class="step-day">Day 22-30</div>
-                                <div class="step-road">Bypass Road West</div>
-                                <div class="step-status status-planned">Planned</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="visualization-footer">
-                    <p>Road Maintenance Visualization System | © 2023 DaangMatino</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="../jscript/testPageScript.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../jscript/supabaseClient.js?v=8"></script>
+    <script src="../jscript/testPageScript.js?v=8"></script>
+
 </body>
 </html>

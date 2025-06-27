@@ -78,15 +78,6 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">
-                        <i class='bx bx-map'></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="affectedAreas">0</h3>
-                        <p>Areas Affected</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
                         <i class='bx bx-time'></i>
                     </div>
                     <div class="stat-info">
@@ -111,15 +102,15 @@
                     </div>
                 </div>
 
-                <!-- Most Urgent Roads -->
+                <!-- Analysis and Prioritization -->
                 <div class="leaderboard-card">
                     <div class="card-header">
-                        <h3><i class='bx bx-error'></i> Most Urgent Roads to Repair</h3>
-                        <p>Roads with critical and high priority issues</p>
+                        <h3><i class='bx bx-bar-chart-alt'></i> Analysis and Prioritization</h3>
+                        <p>Optimized maintenance scheduling based on severity scoring</p>
                     </div>
                     <div class="leaderboard-content">
-                        <div id="mostUrgentList" class="leaderboard-list">
-                            <div class="loading">Loading data...</div>
+                        <div id="quicksortResultsList" class="leaderboard-list">
+                            <div class="loading">Loading prioritization analysis...</div>
                         </div>
                     </div>
                 </div>
@@ -166,12 +157,6 @@
                             </tbody>
                         </table>
                     </div>
-                    
-                    <div class="view-all-container">
-                        <button class="view-all-btn" title="View complete report list" onclick="loadAllReports()">
-                            <i class='bx bx-list-ul'></i> View All Reports
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -182,10 +167,12 @@
     </footer>    <!-- Supabase SDK -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <!-- Database Service -->
-    <script src="../jscript/supabaseClient.js"></script>
+    <script src="../jscript/supabaseClient.js?v=8"></script>
+    <!-- QuickSort Algorithm -->
+    <script src="../jscript/quickSort.js"></script>
     <!-- Analytics Script -->
-    <script src="../jscript/analyticsScript.js"></script>
+    <script src="../jscript/analyticsScript.js?v=8"></script>
     <!-- Admin Page Script -->
-    <script src="../jscript/adminPageScript.js"></script>
+    <script src="../jscript/adminPageScript.js?v=8"></script>
 </body>
 </html>

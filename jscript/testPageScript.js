@@ -7,7 +7,7 @@ let roadNodes = [];
 let roadPolylines = [];
 let selectedRoad = null;
 
-// Report data
+// Report data - now loaded from Supabase only
 let reports = [];
 let reportIdCounter = 1;
 let optimizedSchedule = [];
@@ -41,64 +41,76 @@ const defectData = {
     "Unmaintained Guardrails": { days: 15 }
 };
 
-// Sample data based on DPWH standards
-const sampleReports = [
-    {
-        roadName: "EDSA Northbound KM 12",
-        roadType: "national road",
-        defects: ["Potholes", "Cracks"],
-        severity: "critical",
-        responseTime: 6,
-        description: "Large pothole causing accidents",
-        latlng: [14.5995, 120.9842],
-        severityScore: 0,
-        reportCount: 1
-    },
-    {
-        roadName: "Quezon Avenue",
-        roadType: "municipal",
-        defects: ["Clogged Drains", "Lush Vegetation"],
-        severity: "high",
-        responseTime: 6,
-        description: "Severe flooding during rainy season",
-        latlng: [14.65, 121.03],
-        severityScore: 0,
-        reportCount: 1
-    },
-    {
-        roadName: "Barangay 123 Access Road",
-        roadType: "barangay road",
-        defects: ["Raveling", "No/Faded Road Markings"],
-        severity: "medium",
-        responseTime: 10,
-        description: "Surface deterioration and faded lane markings",
-        latlng: [14.58, 120.98],
-        severityScore: 0,
-        reportCount: 1
-    },
-    {
-        roadName: "C5 Bypass Road",
-        roadType: "bypass road",
-        defects: ["Potholes", "Alligator Cracks"],
-        severity: "critical",
-        responseTime: 9,
-        description: "Multiple large potholes on northbound lane",
-        latlng: [14.61, 121.06],
-        severityScore: 0,
-        reportCount: 1
-    },
-    {
-        roadName: "Taft Avenue Bridge",
-        roadType: "national road",
-        defects: ["Unmaintained Bridges", "Open Manhole"],
-        severity: "high",
-        responseTime: 25,
-        description: "Bridge structural damage observed",
-        latlng: [14.56, 120.99],
-        severityScore: 0,
-        reportCount: 1
+// Load reports from database
+async function loadReportsFromDatabase() {
+    console.log('🔄 Loading reports from database...');
+    
+    try {
+        const result = await DatabaseService.getAllReports();
+        
+        if (result.success) {
+            reports = result.data.map(report => {
+                const defectsList = Array.isArray(report.defects) ? report.defects : [report.defects];
+                const reportData = {
+                    id: report.id,
+                    roadName: report.road_name,
+                    roadType: report.road_type || 'municipal',
+                    defects: defectsList,
+                    severity: report.severity,
+                    description: report.description,
+                    latlng: report.latitude && report.longitude ? [report.latitude, report.longitude] : [14.5995, 120.9842],
+                    reportCount: 1,
+                    created_at: report.created_at,
+                    reporter_name: report.reporter_name,
+                    reporter_contact: report.reporter_contact
+                };
+                
+                // Calculate response time and severity score
+                reportData.responseTime = calculateResponseTime(defectsList);
+                reportData.severityScore = calculateSeverityScore(reportData);
+                
+                return reportData;
+            });
+            
+            console.log(`✅ Loaded ${reports.length} reports from database`);
+            console.log('📊 Sample report data:', reports[0]);
+            
+            updateReportsTable();
+            updateAnalytics();
+        } else {
+            console.error('❌ Failed to load reports:', result.error);
+            reports = [];
+        }
+    } catch (error) {
+        console.error('❌ Error loading reports:', error);
+        reports = [];
     }
-];
+}
+
+async function loadAnalyticsFromDatabase() {
+    console.log('🔄 Loading analytics from database...');
+    
+    try {
+        const result = await DatabaseService.getAnalytics();
+        
+        if (result.success) {
+            const analytics = result.data;
+            
+            // Update analytics display
+            document.getElementById('totalReports').textContent = analytics.total || 0;
+            document.getElementById('recentReportsCount').textContent = analytics.recent || 0;
+            
+            console.log('✅ Analytics loaded successfully');
+            return analytics;
+        } else {
+            console.error('❌ Failed to load analytics:', result.error);
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ Error loading analytics:', error);
+        return null;
+    }
+}
 
 // Hamburger menu functionality
 document.addEventListener('DOMContentLoaded', function() {
@@ -137,22 +149,19 @@ function initMap() {
 }
 
 // Initialize the application
-window.onload = function () {
-    // Load sample data
-    sampleReports.forEach((report) => {
-        reports.push({
-            id: reportIdCounter++,
-            ...report,
-            reportCount: Math.floor(Math.random() * 50) + 1,
-            severityScore: calculateSeverityScore(report),
-        });
-    });
-    updateReportsTable();
-    updateStats();
-
-    // Initialize the map
+window.onload = async function () {
+    console.log('🚀 DaangMatino Test Page initializing...');
+    
+    // Initialize map first
     initMap();
-
+    
+    // Load reports from Supabase
+    await loadReportsFromDatabase();
+    
+    // Initialize UI components
+    initializeReportForm();
+    populateDefectOptions();
+    
     // Set event listeners
     map.on("click", handleMapClick);
 
@@ -161,7 +170,35 @@ window.onload = function () {
 
     // Initialize visualization
     initVisualization();
+    
+    console.log('✅ DaangMatino Test Page initialized successfully');
 };
+
+// Initialize report form
+function initializeReportForm() {
+    // Ensure the form exists and set up event listeners
+    const form = document.getElementById('reportForm');
+    if (form) {
+        form.addEventListener('submit', handleReportSubmission);
+    }
+}
+
+// Handle report form submission
+function handleReportSubmission(event) {
+    event.preventDefault();
+    submitReport();
+}
+
+// Populate defect options
+function populateDefectOptions() {
+    generateDefectCheckboxes();
+}
+
+// Update analytics display
+function updateAnalytics() {
+    // This will be called after loading reports to update the analytics tab
+    updateStats();
+}
 
 // Generate defect checkboxes
 function generateDefectCheckboxes() {
@@ -476,14 +513,15 @@ function switchTab(tabName) {
 }
 
 // Submit report
-function submitReport() {
+async function submitReport() {
     const roadName = document.getElementById("roadName").value.trim();
     const roadType = document.getElementById("detectedRoadType").value;
     const severity = document.getElementById("severity").value;
     const responseTime = parseInt(
         document.getElementById("responseTime").value
     );
-    const description = document.getElementById("description").value.trim();
+    // Description field was removed from the form
+    const description = "";
 
     if (!roadName || !responseTime || responseTime === 0) {
         alert("Please select defects and ensure road is properly selected");
@@ -499,56 +537,90 @@ function submitReport() {
         selectedDefects.push(checkbox.value);
     });
 
-    // Check if road already exists
-    const existingReport = reports.find(
-        (r) => r.roadName.toLowerCase() === roadName.toLowerCase()
-    );
+    // Prepare data for Supabase with correct field names
+    const supabaseData = {
+        defects: selectedDefects.join(', '),
+        severity: severity,
+        road_name: roadName,
+        road_type: roadType,
+        description: description || `${roadType} road with defects: ${selectedDefects.join(', ')}`,
+        latitude: roadNodes.length > 0 ? roadNodes[0].lat : null,
+        longitude: roadNodes.length > 0 ? roadNodes[0].lng : null,
+        reporter_name: null, // Can be added later if needed
+        reporter_contact: null // Can be added later if needed
+    };
 
-    if (existingReport) {
-        existingReport.reportCount++;
-        if (
-            getSeverityScore(severity) >
-            getSeverityScore(existingReport.severity)
-        ) {
-            existingReport.severity = severity;
-            existingReport.defects = selectedDefects;
-            existingReport.responseTime = responseTime;
-            existingReport.description = description;
+    // Try to save to Supabase
+    let supabaseSuccess = false;
+    if (window.DatabaseService && DatabaseService.isAvailable()) {
+        try {
+            console.log('🔄 Attempting to save report to Supabase...');
+            console.log('📋 Report data:', supabaseData);
+            
+            const result = await DatabaseService.createReport(supabaseData);
+            if (result.success) {
+                console.log('✅ Report saved to Supabase successfully!');
+                supabaseSuccess = true;
+                
+                // Reload reports from database to get the latest data
+                await loadReportsFromDatabase();
+            } else {
+                console.error('❌ Failed to save to Supabase:', result.error);
+                alert('Failed to save report to database: ' + result.error);
+                return;
+            }
+        } catch (error) {
+            console.error('❌ Error saving to Supabase:', error);
+            alert('Error saving report: ' + error.message);
+            return;
         }
     } else {
-        const report = {
-            id: reportIdCounter++,
-            roadName,
-            roadType,
-            defects: selectedDefects,
-            severity,
-            responseTime,
-            description,
-            reportCount: 1,
-            severityScore: 0,
-        };
-        reports.push(report);
+        console.log('⚠️ Supabase not available - cannot save report');
+        alert('Database not available. Please check your connection.');
+        return;
     }
 
-    updateReportsTable();
-    updateStats();
+    // Clear form after successful submission
     clearReportForm();
 
-    alert("Report submitted successfully!");
+    const message = supabaseSuccess 
+        ? "Report submitted successfully and saved to database!" 
+        : "Unable to save report - database not available";
+    alert(message);
 }
 
 // Clear report form
 function clearReportForm() {
-    document.getElementById("description").value = "";
+    // Description field was removed from the form
     document.getElementById("responseTime").value = "0";
     clearSelection();
 }
 
 // Remove report
-function removeReport(id) {
-    reports = reports.filter((r) => r.id !== id);
-    updateReportsTable();
-    updateStats();
+async function removeReport(id) {
+    if (!window.DatabaseService || !DatabaseService.isAvailable()) {
+        console.log('⚠️ Database not available - cannot remove report');
+        alert('Database not available. Cannot remove report.');
+        return;
+    }
+
+    try {
+        console.log('🔄 Attempting to delete report from database...');
+        const result = await DatabaseService.deleteReport(id);
+        
+        if (result.success) {
+            console.log('✅ Report deleted successfully');
+            // Reload reports from database
+            await loadReportsFromDatabase();
+            alert('Report deleted successfully!');
+        } else {
+            console.error('❌ Failed to delete report:', result.error);
+            alert('Failed to delete report: ' + result.error);
+        }
+    } catch (error) {
+        console.error('❌ Error deleting report:', error);
+        alert('Error deleting report: ' + error.message);
+    }
 }
 
 // Get severity score
@@ -560,30 +632,61 @@ function getSeverityScore(severity) {
 // Calculate severity score
 function calculateSeverityScore(report) {
     // Road Type Score (RTS)
-    const rts = roadTypeScores[report.roadType] || 0;
+    const rts = roadTypeScores[report.roadType] || roadTypeScores[report.road_type] || 50;
     
-    // Road Defect Score (RDS) - sum of severity scores for all defects
+    // Road Defect Score (RDS) - calculate based on defects
     let rds = 0;
-    report.defects.forEach(defect => {
-        rds += defectData[defect]?.severity || 0;
+    const defects = Array.isArray(report.defects) ? report.defects : [report.defects];
+    defects.forEach(defect => {
+        if (defectData[defect]) {
+            rds += defectData[defect].days * 2; // Convert days to score
+        }
     });
     
-    // Report Frequency Score (RFS) - normalized to 0-100
-    const rfs = Math.min(100, report.reportCount * 5);
+    // Severity multiplier
+    const severityMultiplier = {
+        'critical': 4,
+        'high': 3,
+        'medium': 2,
+        'low': 1
+    };
+    const multiplier = severityMultiplier[report.severity] || 1;
     
-    // Calculate severity score
-    const severityScore = (rts * 0.40) + (rds * 0.50) + (rfs * 0.10);
+    // Report Frequency Score (RFS) - normalized to 0-100
+    const rfs = Math.min(100, (report.reportCount || 1) * 5);
+    
+    // Calculate final severity score
+    const severityScore = (rts * 0.30) + (rds * multiplier * 0.60) + (rfs * 0.10);
     
     return Math.round(severityScore);
 }
 
+// Calculate response time based on defects
+function calculateResponseTime(defects) {
+    let totalDays = 0;
+    const defectList = Array.isArray(defects) ? defects : [defects];
+    
+    defectList.forEach(defect => {
+        if (defectData[defect]) {
+            totalDays += defectData[defect].days;
+        }
+    });
+    
+    return totalDays || 7; // Default to 7 days if no defects match
+}
+
 // Update reports table
 function updateReportsTable() {
+    console.log('📊 Updating reports table...');
     const tbody = document.getElementById("reportsBody");
 
+    if (!tbody) {
+        console.error('❌ Reports table body not found');
+        return;
+    }
+
     if (reports.length === 0) {
-        tbody.innerHTML =
-            '<tr><td colspan="8" class="empty-state">No reports submitted yet. Be the first to report a road defect!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No reports submitted yet. Be the first to report a road defect!</td></tr>';
         return;
     }
 
@@ -593,38 +696,76 @@ function updateReportsTable() {
     });
 
     tbody.innerHTML = reports
-        .map(
-            (report) => `
+        .map((report, index) => {
+            // Handle defects array display
+            const defectsDisplay = Array.isArray(report.defects) 
+                ? report.defects.join(', ') 
+                : (report.defects || 'Not specified');
+
+            // Format the date properly
+            const dateCreated = report.created_at 
+                ? new Date(report.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })
+                : 'Not available';
+
+            console.log(`🔍 Report ${index + 1}:`, {
+                id: report.id,
+                road_name: report.roadName,
+                road_type: report.roadType,
+                defects: report.defects,
+                severity: report.severity,
+                created_at: report.created_at,
+                formatted_date: dateCreated
+            });
+
+            return `
                 <tr class="animate-in">
                     <td><strong>${report.roadName}</strong></td>
                     <td><span class="road-${report.roadType.replace(' ', '-')}">${report.roadType}</span></td>
-                    <td>${report.defects.join(", ")}</td>
+                    <td>${defectsDisplay}</td>
                     <td><span class="severity-${report.severity}">${report.severity.toUpperCase()}</span></td>
-                    <td>${report.responseTime} days</td>
-                    <td><strong>${report.reportCount}</strong></td>
+                    <td>${report.responseTime || 'N/A'} days</td>
+                    <td><strong>${report.reportCount || 1}</strong></td>
                     <td><strong>${report.severityScore}</strong></td>
+                    <td>${dateCreated}</td>
                     <td><button class="btn-danger" onclick="removeReport(${report.id})">Remove</button></td>
                 </tr>
-            `
-        )
+            `;
+        })
         .join("");
 }
 
 // Update statistics
 function updateStats() {
-    document.getElementById("totalReports").textContent = reports.length;
-    document.getElementById("criticalIssues").textContent = reports.filter(
-        (r) => r.severity === "critical"
-    ).length;
-
-    const avgResponse =
-        reports.length > 0
-            ? Math.round(
-                  reports.reduce((sum, r) => sum + r.responseTime, 0) /
-                  reports.length
-              )
-            : 0;
-    document.getElementById("avgResponseTime").textContent = avgResponse;
+    const totalReportsElement = document.getElementById("totalReports");
+    const criticalIssuesElement = document.getElementById("criticalIssues");
+    const avgResponseTimeElement = document.getElementById("avgResponseTime");
+    
+    if (totalReportsElement) {
+        totalReportsElement.textContent = reports.length;
+    }
+    
+    if (criticalIssuesElement) {
+        criticalIssuesElement.textContent = reports.filter(
+            (r) => r.severity === "critical"
+        ).length;
+    }
+    
+    if (avgResponseTimeElement) {
+        const avgResponse =
+            reports.length > 0
+                ? Math.round(
+                      reports.reduce((sum, r) => sum + (r.responseTime || 7), 0) /
+                      reports.length
+                  )
+                : 0;
+        avgResponseTimeElement.textContent = avgResponse;
+    }
 }
 
 // Knapsack Algorithm Implementation

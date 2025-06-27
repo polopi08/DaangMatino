@@ -26,7 +26,8 @@
     "@supabase/supabase-js": "^2.50.0"
   },
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "kill-port": "^2.0.1"
   },
   "repository": {
     "type": "git",
