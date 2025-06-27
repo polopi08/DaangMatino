@@ -1,19 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>   
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DaangMatino - Road Network Maintenance Planning System</title>
-    <script>
-        // Redirect to landing page immediately
-        window.location.href = './pages/landingPage.html';
-    </script>
+    <meta name="description" content="DaangMatino - Road Network Maintenance Planning System">
+    <title>DaangMatino | Road Network Maintenance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="/assets/landingPageStyle.css">
 </head>
 <body>
-    <div style="text-align: center; margin-top: 50px; font-family: Arial, sans-serif;">
-        <h1>DaangMatino</h1>
-        <p>Redirecting to main page...</p>
-        <p><a href="./pages/landingPage.html">Click here if not redirected automatically</a></p>
-    </div>
+
+     <div class="floating-elements">
+        <div class="floating-cone"><i class='bx bx-traffic-cone'></i></div>
+        <div class="floating-cone"><i class='bx bx-traffic-cone'></i></div>
+        <div class="floating-cone"><i class='bx bx-traffic-cone'></i></div>
+        <div class="floating-vehicle"><i class='bx bx-truck'></i></div>
+        <div class="floating-vehicle"><i class='bx bx-van'></i></div>
+        <div class="floating-road"><i class='bx bx-traffic-barrier'></i></div>
+        <div class="floating-road"><i class='bx bx-traffic-barrier'></i></div>
+        <div class="floating-sign"><i class='bx bx-alert-triangle'></i></div>
+        <div class="floating-sign"><i class='bx bx-siren'></i></div>
+    </div>    <header class="header-sticky"> 
+        <a href="index.html" class="logo">
+            <img src="/assets/logowDAA.png" alt="Company Logo">
+            DaangMatino 
+        </a><ul class="navbar">
+            <li><a href="#home" class="active">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="pages/analyticsPage.html">Analytics</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="pages/maps.html">Maps</a></li>
+        </ul>
+        <div class="nav-actions">
+            <div class="reportButton">
+                <a href="pages/reportPage.html"><button>Report Road Damage</button></a> 
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+
+    <section class="hero" id="home">
+        <div class="hero-content" data-aos="fade-up">
+            <h1>Road Network Maintenance<br>Planning System</h1>
+            <p>Help make our roads safer by reporting potholes, damaged signs, and other road hazards in real-time.</p>
+            <div class="hero-buttons">
+                <a href="pages/reportPage.html"><button class="btn-primary"><i class='bx bx-siren-alt'></i> Report an Issue</button></a>
+                <a href="#features"><button class="btn-secondary"><i class='bx bx-search-alt'></i> Explore Features</button></a>
+            </div>
+        </div>
+    </section>
+    
+    <section class="features" id="features">
+        <div class="features-header" data-aos="fade-up">
+            <h2>Key Features</h2>
+            <p>Explore how DaangMatino is transforming road maintenance by combining citizen participation with smart technology solutions</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                <span class="feature-icon"><i class='bx bx-mobile'></i></span>
+                <h3>Citizen Reporting System</h3>
+                <p>Citizens can report road damage with photos, descriptions, and track progress with updates</p>
+            </div>
+              
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                <span class="feature-icon"><i class='bx bx-arrow-big-up-line'></i></span>
+                <h3>Priority Queueing</h3>
+                <p>Intelligent road repair prioritization system</p>
+            </div>
+
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                <span class="feature-icon"><i class='bx bx-split'></i></span>
+                <h3>Alternative Route Generator</h3>
+                <p>Compute and display optimal routes for motorists affected by ongoing repairs</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="algorithm" id="about">
+        <div class="algorithm-header" data-aos="fade-up">
+            <h2>Smart Algorithms Behind the System</h2>
+            <p>Our system uses smart algorithms to improve road maintenance planning and make better use of resources</p>
+        </div>
+
+        <div class="algorithm-grid">
+            <div class="algorithm-card" data-aos="fade-up" data-aos-delay="100">
+                <h3><i class='bx bx-gear'></i>Knapsack Problem</h3>
+                <p>Used to select a subset of roads that can be repaired within a limited time, based on severity and repair duration</p>
+            </div>
+
+            <div class="algorithm-card" data-aos="fade-up" data-aos-delay="200">
+                <h3><i class='bx bx-strategy'></i>Dijkstra's Algorithm</h3>
+                <p>Identifies optimal alternative routes for commuters when main roads are under maintenance</p>
+            </div>  
+
+            <div class="algorithm-card" data-aos="fade-up" data-aos-delay="300">
+                <h3><i class='bx bx-fast-forward'></i>Quick Sort</h3>
+                <p>Sorts the selected roads by severity and other factors to prioritize the repair order</p>
+            </div>  
+        </div>
+    </section> 
+
+  <footer id="contact">
+        <div class="footer-container">
+            <div class="footer-branding">
+                <h3>
+                    <img src="/assets/DPWH.png" alt="DPWH Logo"> 
+                    DPWH
+                </h3>
+                <p class="footer-subtitle">Department of Public Works and Highways</p>
+            </div>
+
+            <div class="footer-contact">
+                <h4>Contact Information</h4>
+                <div class="contact-item">
+                    <i class='bx bx-phone'></i>
+                    <span><strong>Telephone:</strong> (02) 8687‑2800 local 601–603</span>
+                </div>
+                <div class="contact-item">
+                    <i class='bx bx-envelope'></i>
+                    <span><strong>Email:</strong> <a href="mailto:info@dpwh.gov.ph">info@dpwh.gov.ph</a></span>
+                </div>
+                <div class="contact-item">
+                    <i class='bx bx-globe'></i>
+                    <span><strong>Website:</strong> <a href="https://dpwh.gov.ph" target="_blank">dpwh.gov.ph</a></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 DaangMatino. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top" aria-label="Back to top">
+        <i class='bx bx-up-arrow-alt'></i>
+    </button>
+
+    <!-- Supabase SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <!-- Database Service -->
+    <script src="/jscript/supabaseClient.js"></script>
+    <!-- Landing Page Script -->
+    <script src="/jscript/landingPageScript.js"></script>
 </body>
 </html>
+

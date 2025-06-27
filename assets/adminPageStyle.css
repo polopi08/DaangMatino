@@ -64,12 +64,13 @@ header {
 }
 
 .dashboard {
-    padding: 40px 5%;
+    padding: 40px 3%;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 40px;
-    flex-wrap: wrap;
+    gap: 30px;
+    flex-wrap: nowrap;
+    width: 100%;
 }
 
 .left-section {
@@ -77,6 +78,7 @@ header {
     flex-direction: column;
     gap: 30px;
     width: 350px;
+    flex-shrink: 0;
 }
 
 .total-reports {
@@ -196,6 +198,7 @@ header {
     filter: brightness(1.1) drop-shadow(0 0 8px #ffd43b);
 }
 
+/* Dynamic Chart Styles */
 #pieChartContainer {
     display: flex;
     justify-content: center;
@@ -285,18 +288,27 @@ header {
 }
 
 .summary-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    border-radius: 15px;
-    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e9ecef;
-    position: relative;
     overflow: hidden;
-    transition: box-shadow 0.3s, transform 0.3s;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
 }
 
 .summary-card:hover {
-    box-shadow: 0 12px 32px rgba(255, 212, 59, 0.18), 0 2px 8px rgba(0,0,0,0.08);
+    border-color: #ffd43b;
+}
+
+.summary-card h3 {
+    background: linear-gradient(135deg, #333 0%, #495057 100%);
+    color: white;
+    padding: 25px;
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
     transform: translateY(-4px) scale(1.01);
 }
 
@@ -310,13 +322,6 @@ header {
     background: linear-gradient(to right, #FAFAD2, #FFD300);
 }
 
-.summary-card h3 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 25px;
-    text-align: center;
-}
 
 .table-container {
     overflow-x: auto;
@@ -377,7 +382,7 @@ header {
     border-radius: 50%;
     font-weight: 600;
     font-size: 12px;
-    color: black;
+    color: white;
 }
 
 .priority-1 {
@@ -393,7 +398,11 @@ header {
 }
 
 .priority-4 {
-    background: linear-gradient(135deg, #28a745, #1dde4a);
+    background: linear-gradient(135deg, #28a745, #218838);
+}
+
+.priority-5 {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
 }
 
 .severity-badge {
@@ -482,6 +491,7 @@ header {
     transform: translateY(0);
 }
 
+/* Admin Profile Styles */
 .admin-profile {
     display: flex;
     align-items: center;
@@ -502,6 +512,7 @@ header {
     color: #333;
 }
 
+/* Admin Navbar Styles */
 .admin-navbar {
     margin-left: auto;
 }
@@ -536,6 +547,7 @@ header {
     font-size: 18px;
 }
 
+/* Footer Styles */
 .admin-footer {
     text-align: center;
     padding: 20px 0;
@@ -546,6 +558,7 @@ header {
     border-top: 1px solid #ffd43b;
 }
 
+/* Table Improvements */
 .reports-table tbody tr:nth-child(even) {
     background: #f9fafb;
 }
@@ -554,6 +567,7 @@ header {
     background: #ffe066 !important;
 }
 
+/* Report Modal Styles */
 .report-modal {
     position: fixed;
     top: 0;
@@ -613,6 +627,7 @@ header {
     border-radius: 5px;
 }
 
+/* Notification Styles */
 .notification {
     position: fixed;
     top: 20px;
@@ -675,6 +690,7 @@ header {
     background-color: #f0f0f0;
 }
 
+/* Analytics Dashboard Section */
 .analytics-dashboard {
     background: linear-gradient(135deg, #ffd43b 0%, #ffed4a 50%, #fff8b3 100%);
     min-height: 100vh;
@@ -713,6 +729,7 @@ header {
     margin: 0;
 }
 
+/* Stats Overview */
 .stats-overview {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -765,6 +782,7 @@ header {
     font-weight: 500;
 }
 
+/* Leaderboards */
 .leaderboards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -883,23 +901,30 @@ header {
     font-size: 13px;
 }
 
+/* Recent Activity */
 .recent-activity {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 15px;
+    padding: 30px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+    position: relative;
     overflow: hidden;
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
+    transition: box-shadow 0.3s, transform 0.3s;
+    flex: 1;
+    min-width: 600px;
+    max-width: 1200px;
 }
 
 .recent-activity:hover {
-    border-color: #ffd43b;
+    box-shadow: 0 12px 32px rgba(255, 212, 59, 0.18), 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .activity-header {
-    background: linear-gradient(135deg, #333 0%, #495057 100%);
-    color: white;
-    padding: 25px;
+    background: transparent;
+    color: #333;
+    padding: 0;
+    margin-bottom: 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -907,8 +932,9 @@ header {
 
 .activity-header h3 {
     margin: 0;
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -940,7 +966,7 @@ header {
 }
 
 .activity-list {
-    padding: 25px;
+    padding: 0;
     max-height: 400px;
     overflow-y: auto;
 }
@@ -1006,6 +1032,7 @@ header {
     font-style: italic;
 }
 
+/* Loading styles for the reports table */
 .loading-row {
     text-align: center;
     padding: 40px !important;
@@ -1025,6 +1052,7 @@ header {
     color: #ffd43b;
 }
 
+/* Empty state */
 .empty-state {
     text-align: center;
     padding: 40px;
@@ -1038,6 +1066,7 @@ header {
     display: block;
 }
 
+/* Simplified Admin Header */
 .admin-header-simple {
     background: linear-gradient(135deg, #ffd43b 0%, #ffed4a 100%);
     padding: 15px 5%;
@@ -1073,41 +1102,80 @@ header {
     letter-spacing: 0.5px;
 }
 
-.delete-btn {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    transition: background-color 0.2s ease-in-out;
-}
-
-.delete-btn:hover {
-    background-color: #c82333;
-}
-
-.delete-btn i {
-    font-size: 15px;
-}
-
+/* Pie Chart Hover Label */
 .pie-chart-hover-label {
     text-align: center;
     margin-top: 15px;
-    font-size: 1.1em;
-    /* font-weight: bold; */
-    color: var(--dark);
+    padding: 8px 12px;
+    background: rgba(255, 212, 59, 0.9);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    border: 1px solid #ffd43b;
     min-height: 20px;
-
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    transition: all 0.3s ease;
+    opacity: 1;
+    visibility: visible;
 }
 
+.pie-chart-hover-label.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Adjustments for summary card with dark header */
+.summary-card .table-container {
+    padding: 25px;
+    margin: 0;
+}
+
+.summary-card .view-all-container {
+    padding: 0 25px 25px 25px;
+}
+
+button.delete-btn {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+    padding: 6px 10px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 13px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    transition: background-color 0.2s ease-in-out !important;
+    font-family: inherit !important;
+    text-decoration: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    min-width: auto !important;
+    height: auto !important;
+}
+
+button.delete-btn:hover {
+    background-color: #c82333 !important;
+}
+
+button.delete-btn:focus {
+    background-color: #c82333 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.5) !important;
+}
+
+button.delete-btn:active {
+    background-color: #b02a33 !important;
+    transform: translateY(1px) !important;
+}
+
+button.delete-btn i {
+    font-size: 15px !important;
+    color: white !important;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
     header {
         flex-direction: column;
@@ -1134,9 +1202,10 @@ header {
         padding: 20px 2%;
     }
     
-    .left-section, .summary-section {
+    .left-section, .recent-activity {
         width: 100% !important;
         min-width: unset;
+        flex: none;
     }
     
     .analytics-dashboard .container {

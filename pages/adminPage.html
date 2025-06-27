@@ -6,8 +6,7 @@
     <meta name="description" content="DaangMatino Admin Dashboard - Road maintenance tracking and reporting system">
     <title>Admin Dashboard | John Paul Tamares</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="../assets/adminPageStyle.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    <link rel="stylesheet" href="../assets/adminPageStyle.css">
 </head>
 <body>
     <header class="admin-header-simple">
@@ -18,15 +17,14 @@
     </header>
 
     <main class="dashboard">
-        <div class="left-section">
-            <div class="total-reports">
+        <div class="left-section">            <div class="total-reports">
                 <h2>Total Reports</h2>
                 <div class="report-number">7</div>
-            </div>
-            <div class="chart-section">
+            </div>            <div class="chart-section">
                 <h3>Reports by Priority</h3>
                 <div class="chart-container">
                     <div id="pieChartContainer">
+                        <!-- Pie chart will be dynamically generated here -->
                     </div>
                 </div>
                 <div id="pieChartHoverLabel" class="pie-chart-hover-label">
@@ -34,44 +32,23 @@
                 </div>
             </div>
         </div>
-        <div class="summary-section">
-            <div class="summary-card">
-                <h3>Summary of Reports as of <span id="currentDate"></span></h3>
-
-                <div class="table-container">
-                    <table class="reports-table">
-                        <thead>
-                            <tr>
-                                <th>Priority</th>
-                                <th>Road</th>
-                                <th>Type of Road</th>
-                                <th>Severity</th>
-                                <th>Type of Defect</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportsTableBody">
-                            <tr>
-                                <td colspan="6" class="loading-row">
-                                    <div class="loading-spinner">
-                                        <i class='bx bx-loader-alt bx-spin'></i>
-                                        Loading reports from database...
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="view-all-container">
-                    <button class="view-all-btn" title="View complete report list" onclick="loadAllReports()">
-                        <i class='bx bx-list-ul'></i> View All Reports
-                    </button>
-                </div>
+        
+        <!-- Recent Activity (moved from analytics section) -->
+        <div class="recent-activity">
+            <div class="activity-header">
+                <h3>Recent Reports</h3>
+                <button id="refreshBtn" class="refresh-btn">
+                    <i class='bx bx-refresh'></i> Refresh
+                </button>
+            </div>
+            <div class="activity-list" id="recentActivity">
+                <div class="loading">Loading recent activity...</div>
             </div>
         </div>
+
     </main>
 
+    <!-- Analytics Dashboard Section -->
     <section class="analytics-dashboard">
         <div class="container">
             <div class="analytics-header">
@@ -79,6 +56,7 @@
                 <p>Comprehensive insights and leaderboards for road maintenance planning</p>
             </div>
 
+            <!-- Statistics Overview -->
             <div class="stats-overview">
                 <div class="stat-card">
                     <div class="stat-icon">
@@ -118,7 +96,9 @@
                 </div>
             </div>
 
+            <!-- Leaderboards -->
             <div class="leaderboards">
+                <!-- Most Reported Roads -->
                 <div class="leaderboard-card">
                     <div class="card-header">
                         <h3><i class='bx bx-trending-up'></i> Most Reported Roads</h3>
@@ -131,6 +111,7 @@
                     </div>
                 </div>
 
+                <!-- Most Urgent Roads -->
                 <div class="leaderboard-card">
                     <div class="card-header">
                         <h3><i class='bx bx-error'></i> Most Urgent Roads to Repair</h3>
@@ -143,6 +124,7 @@
                     </div>
                 </div>
 
+                <!-- Issue Types Distribution -->
                 <div class="leaderboard-card">
                     <div class="card-header">
                         <h3><i class='bx bx-pie-chart'></i> Most Common Issues</h3>
@@ -155,6 +137,7 @@
                     </div>
                 </div>
 
+                <!-- Geographic Distribution -->
                 <div class="leaderboard-card">
                     <div class="card-header">
                         <h3><i class='bx bx-map-pin'></i> Most Affected Areas</h3>
@@ -168,15 +151,40 @@
                 </div>
             </div>
 
-            <div class="recent-activity">
-                <div class="activity-header">
-                    <h3>Recent Reports</h3>
-                    <button id="refreshBtn" class="refresh-btn">
-                        <i class='bx bx-refresh'></i> Refresh
-                    </button>
-                </div>
-                <div class="activity-list" id="recentActivity">
-                    <div class="loading">Loading recent activity...</div>
+            <!-- Summary Section (moved from main dashboard) -->
+            <div class="summary-section">
+                <div class="summary-card">
+                    <h3><i class='bx bx-table'> </i> &nbsp Summary of Reports as of &nbsp<span id="currentDate"></span></h3>
+                    <h3></h3>
+                    <div class="table-container">
+                        <table class="reports-table">
+                            <thead>
+                                <tr>
+                                    <th>Priority</th>
+                                    <th>Road</th>
+                                    <th>Type of Road</th>
+                                    <th>Severity</th>
+                                    <th>Type of Defect</th>                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsTableBody">
+                                <tr>
+                                    <td colspan="6" class="loading-row">
+                                        <div class="loading-spinner">
+                                            <i class='bx bx-loader-alt bx-spin'></i>
+                                            Loading reports from database...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="view-all-container">
+                        <button class="view-all-btn" title="View complete report list" onclick="loadAllReports()">
+                            <i class='bx bx-list-ul'></i> View All Reports
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -184,10 +192,13 @@
 
     <footer class="admin-footer">
         <p>&copy; 2025 DaangMatino Admin Dashboard</p>
-    </footer>
+    </footer>    <!-- Supabase SDK -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Database Service -->
     <script src="../jscript/supabaseClient.js"></script>
+    <!-- Analytics Script -->
     <script src="../jscript/analyticsScript.js"></script>
+    <!-- Admin Page Script -->
     <script src="../jscript/adminPageScript.js"></script>
 </body>
 </html>

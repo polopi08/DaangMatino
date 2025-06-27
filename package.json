@@ -4,12 +4,12 @@
   "description": "Road Network Maintenance Planning System - A civic technology platform for reporting and managing road infrastructure issues",
   "main": "pages/landingPage.html",
   "scripts": {
-    "dev": "npx http-server . -p 3000 -o",
+    "dev": "npx http-server . -p 3006 -o",
     "start": "npx http-server . -p 8080",
     "build": "echo 'Static site - no build step required'",
     "preview": "npx http-server . -p 4173 -o",
     "install-deps": "npm install",
-    "serve": "npx http-server . -p 3000 -c-1"
+    "serve": "npx http-server . -p 3006 -c-1"
   },
   "keywords": [
     "civic-tech",

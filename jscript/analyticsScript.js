@@ -253,15 +253,23 @@ document.addEventListener('DOMContentLoaded', function() {
     function createActivityItem(report) {
         const timeAgo = getTimeAgo(new Date(report.created_at));
         const icon = getIssueIcon(report.issue_type);
+        const priority = report.priority || 'Medium';
+        const priorityClass = priority.toLowerCase();
+        const description = report.description || 'No description provided';
+        const truncatedDesc = description.length > 60 ? description.substring(0, 60) + '...' : description;
         
         return `
             <div class="activity-item">
                 <div class="activity-icon">
                     <i class='bx ${icon}'></i>
                 </div>
-                <div class="activity-content">
-                    <div class="activity-title">${report.issue_type} reported</div>
-                    <div class="activity-details">${report.location_description}</div>
+                <div class="activity-info">
+                    <h4>${report.issue_type} reported 
+                        <span class="activity-priority priority-${priorityClass}">${priority}</span>
+                    </h4>
+                    <p><strong>Location:</strong> ${report.location_description}</p>
+                    <p><strong>Details:</strong> ${truncatedDesc}</p>
+                    ${report.reporter_name ? `<p><strong>Reporter:</strong> ${report.reporter_name}</p>` : ''}
                 </div>
                 <div class="activity-time">${timeAgo}</div>
             </div>
@@ -424,31 +432,71 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="activity-icon">
                     <i class='bx bx-error-circle'></i>
                 </div>
-                <div class="activity-content">
-                    <div class="activity-title">Pothole reported</div>
-                    <div class="activity-details">Corner of 5th Street and Pine Avenue</div>
+                <div class="activity-info">
+                    <h4>Road Sign Issue reported 
+                        <span class="activity-priority priority-high">High</span>
+                    </h4>
+                    <p><strong>Location:</strong> asdfghjk</p>
+                    <p><strong>Details:</strong> Traffic sign is damaged and needs immediate attention for safety</p>
+                    <p><strong>Reporter:</strong> City Inspector</p>
                 </div>
-                <div class="activity-time">2h ago</div>
+                <div class="activity-time">3d ago</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class='bx bx-error-circle'></i>
+                </div>
+                <div class="activity-info">
+                    <h4>Road Sign Issue reported 
+                        <span class="activity-priority priority-high">High</span>
+                    </h4>
+                    <p><strong>Location:</strong> cdvfbgnhmjk</p>
+                    <p><strong>Details:</strong> Missing road sign causing navigation issues</p>
+                    <p><strong>Reporter:</strong> Local Resident</p>
+                </div>
+                <div class="activity-time">3d ago</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class='bx bx-error-circle'></i>
+                </div>
+                <div class="activity-info">
+                    <h4>Pothole reported 
+                        <span class="activity-priority priority-medium">Medium</span>
+                    </h4>
+                    <p><strong>Location:</strong> adfsgdhfjgk</p>
+                    <p><strong>Details:</strong> Large pothole affecting vehicle passage</p>
+                    <p><strong>Reporter:</strong> John Smith</p>
+                </div>
+                <div class="activity-time">3d ago</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class='bx bx-error-circle'></i>
+                </div>
+                <div class="activity-info">
+                    <h4>Road Sign Issue reported 
+                        <span class="activity-priority priority-high">High</span>
+                    </h4>
+                    <p><strong>Location:</strong> asdfghjkl</p>
+                    <p><strong>Details:</strong> Stop sign visibility is compromised</p>
+                    <p><strong>Reporter:</strong> Traffic Department</p>
+                </div>
+                <div class="activity-time">3d ago</div>
             </div>
             <div class="activity-item">
                 <div class="activity-icon">
                     <i class='bx bx-construction'></i>
                 </div>
-                <div class="activity-content">
-                    <div class="activity-title">Road damage reported</div>
-                    <div class="activity-details">Main Highway near Mile Marker 15</div>
+                <div class="activity-info">
+                    <h4>Damaged Road reported 
+                        <span class="activity-priority priority-low">Low</span>
+                    </h4>
+                    <p><strong>Location:</strong> sfdrd</p>
+                    <p><strong>Details:</strong> Minor surface wear requiring routine maintenance</p>
+                    <p><strong>Reporter:</strong> Highway Patrol</p>
                 </div>
-                <div class="activity-time">4h ago</div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-icon">
-                    <i class='bx bx-traffic-cone'></i>
-                </div>
-                <div class="activity-content">
-                    <div class="activity-title">Traffic light issue reported</div>
-                    <div class="activity-details">Downtown intersection - Broadway & 1st</div>
-                </div>
-                <div class="activity-time">6h ago</div>
+                <div class="activity-time">3d ago</div>
             </div>
         `;
     }

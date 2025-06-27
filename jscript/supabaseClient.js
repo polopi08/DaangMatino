@@ -92,30 +92,91 @@ class DatabaseService {
                     public_id: 'RPT-000001',
                     issue_type: 'Pothole',
                     priority: 'High',
+                    priority_value: 2,
                     location_description: 'Corner of Main St. and Oak Ave.',
                     description: 'Large pothole causing traffic hazard',
                     created_at: new Date().toISOString(),
-                    reporter_name: 'John Doe'
+                    reporter_name: 'John Doe',
+                    road_type: 'Municipal',
+                    damage_type: 'Pothole'
                 },
                 {
                     id: 2,
                     public_id: 'RPT-000002',
                     issue_type: 'Damaged Road',
                     priority: 'Medium',
+                    priority_value: 3,
                     location_description: 'Highway 101 near Exit 15',
                     description: 'Cracked pavement surface',
                     created_at: new Date(Date.now() - 86400000).toISOString(),
-                    reporter_name: 'Jane Smith'
+                    reporter_name: 'Jane Smith',
+                    road_type: 'National',
+                    damage_type: 'Crack'
                 },
                 {
                     id: 3,
                     public_id: 'RPT-000003',
                     issue_type: 'Traffic Light Issue',
                     priority: 'Critical',
+                    priority_value: 1,
                     location_description: 'Intersection of First St. and Broadway',
                     description: 'Traffic light not functioning properly',
                     created_at: new Date(Date.now() - 172800000).toISOString(),
-                    reporter_name: null
+                    reporter_name: null,
+                    road_type: 'Municipal',
+                    damage_type: 'Traffic Signal'
+                },
+                {
+                    id: 4,
+                    public_id: 'RPT-000004',
+                    issue_type: 'Flooding',
+                    priority: 'High',
+                    priority_value: 2,
+                    location_description: 'Downtown Bridge Area',
+                    description: 'Road flooding during rain',
+                    created_at: new Date(Date.now() - 259200000).toISOString(),
+                    reporter_name: 'Mike Wilson',
+                    road_type: 'Provincial',
+                    damage_type: 'Drainage Issue'
+                },
+                {
+                    id: 5,
+                    public_id: 'RPT-000005',
+                    issue_type: 'Damaged Road',
+                    priority: 'Low',
+                    priority_value: 4,
+                    location_description: 'Residential Lane 5',
+                    description: 'Minor surface wear',
+                    created_at: new Date(Date.now() - 345600000).toISOString(),
+                    reporter_name: 'Sarah Davis',
+                    road_type: 'Municipal',
+                    damage_type: 'Surface Wear'
+                },
+                {
+                    id: 6,
+                    public_id: 'RPT-000006',
+                    issue_type: 'Pothole',
+                    priority: 'Critical',
+                    priority_value: 1,
+                    location_description: 'Main Highway Intersection',
+                    description: 'Dangerous pothole at busy intersection',
+                    created_at: new Date(Date.now() - 432000000).toISOString(),
+                    reporter_name: 'Emergency Services',
+                    road_type: 'National',
+                    damage_type: 'Pothole'
+                },
+                {
+                    id: 7,
+                    public_id: 'RPT-000007',
+                    issue_type: 'Road Marking',
+                    priority: 'Medium',
+                    priority_value: 3,
+                    location_description: 'School Zone Area',
+                    description: 'Faded road markings near school',
+                    created_at: new Date(Date.now() - 518400000).toISOString(),
+                    reporter_name: 'School Principal',
+                    road_type: 'Municipal',
+                    damage_type: 'Road Marking'
                 }
             ]
         };
@@ -527,6 +588,13 @@ class DatabaseService {
     }
 }
 
-// Export for use in other files
+// Ensure DatabaseService is available globally
 window.DatabaseService = DatabaseService;
+
+// Debug logging for service availability
+console.log('DatabaseService status:');
+console.log('- Available:', DatabaseService.isAvailable());
+console.log('- Sample reports:', DatabaseService.generateSampleReports());
+
+// Export for use in other files
 window.supabaseClient = supabase;
