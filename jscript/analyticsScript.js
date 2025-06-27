@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadMostReportedRoads(),
                 loadMostUrgentRoads(),
                 loadIssueTypesDistribution(),
-                loadAffectedAreas(),
                 loadRecentActivity()
             ]);
 
@@ -66,17 +65,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('criticalReports').textContent = stats.byPriority?.Critical || 0;
                 document.getElementById('recentReports').textContent = stats.recent || 0;
                 
-                // Calculate affected areas (approximate based on unique locations)
-                const affectedCount = Math.min(stats.total, Math.ceil(stats.total * 0.7)); // Estimate
-                document.getElementById('affectedAreas').textContent = affectedCount;
-                
                 console.log('📊 Statistics loaded:', stats);
             } else {
                 // Demo mode - show sample stats
                 document.getElementById('totalReports').textContent = '47';
                 document.getElementById('criticalReports').textContent = '8';
                 document.getElementById('recentReports').textContent = '12';
-                document.getElementById('affectedAreas').textContent = '23';
             }
         } catch (error) {
             console.error('Error loading statistics:', error);
@@ -165,38 +159,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    async function loadAffectedAreas() {
-        try {
-            const reportsResult = await DatabaseService.getAllReports();
-            const container = document.getElementById('affectedAreasList');
-            
-            if (reportsResult.success && reportsResult.data.length > 0) {
-                // Extract area information from location descriptions
-                const areaCounts = {};
-                reportsResult.data.forEach(report => {
-                    // Simple area extraction (you can make this more sophisticated)
-                    const location = report.location_description || '';
-                    const area = extractAreaFromLocation(location);
-                    areaCounts[area] = (areaCounts[area] || 0) + 1;
-                });
-
-                const sortedAreas = Object.entries(areaCounts)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 5);
-
-                container.innerHTML = sortedAreas.map((item, index) => 
-                    createLeaderboardItem(index + 1, item[0], `${item[1]} reports`, item[1])
-                ).join('');
-            } else {
-                // Demo data
-                container.innerHTML = getDemoAffectedAreas();
-            }
-        } catch (error) {
-            console.error('Error loading affected areas:', error);
-            document.getElementById('affectedAreasList').innerHTML = '<div class="loading">Error loading data</div>';
-        }
-    }
-
     async function loadRecentActivity() {
         try {
             const reportsResult = await DatabaseService.getAllReports();
@@ -274,17 +236,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="activity-time">${timeAgo}</div>
             </div>
         `;
-    }
-
-    function extractAreaFromLocation(location) {
-        // Simple area extraction - you can make this more sophisticated
-        const words = location.split(' ');
-        for (let word of words) {
-            if (word.includes('St') || word.includes('Ave') || word.includes('Rd') || word.includes('Blvd')) {
-                return word;
-            }
-        }
-        return words[0] || 'Unknown Area';
     }
 
     function getIssueIcon(issueType) {
@@ -393,35 +344,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="item-subtitle">Malfunctioning signals</div>
                 </div>
                 <div class="item-count">7</div>
-            </div>
-        `;
-    }
-
-    function getDemoAffectedAreas() {
-        return `
-            <div class="leaderboard-item">
-                <div class="item-rank rank-1">#1</div>
-                <div class="item-info">
-                    <div class="item-title">Downtown District</div>
-                    <div class="item-subtitle">Central business area</div>
-                </div>
-                <div class="item-count">15</div>
-            </div>
-            <div class="leaderboard-item">
-                <div class="item-rank rank-2">#2</div>
-                <div class="item-info">
-                    <div class="item-title">Residential North</div>
-                    <div class="item-subtitle">Suburban neighborhoods</div>
-                </div>
-                <div class="item-count">11</div>
-            </div>
-            <div class="leaderboard-item">
-                <div class="item-rank rank-3">#3</div>
-                <div class="item-info">
-                    <div class="item-title">Industrial Zone</div>
-                    <div class="item-subtitle">Manufacturing district</div>
-                </div>
-                <div class="item-count">8</div>
             </div>
         `;
     }

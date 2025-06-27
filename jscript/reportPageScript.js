@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (viewAnalyticsBtn) {
             viewAnalyticsBtn.addEventListener('click', function() {
                 successModal.style.display = 'none';
-                window.location.href = 'analyticsPage.html';
+                window.location.href = 'test.html';
             });
         }
         
