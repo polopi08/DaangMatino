@@ -94,6 +94,7 @@
                     <div class="card-header">
                         <h3><i class='bx bx-trending-up'></i> Most Reported Roads</h3>
                         <p>Roads with the highest number of reports</p>
+                        
                     </div>
                     <div class="leaderboard-content">
                         <div id="mostReportedList" class="leaderboard-list">
@@ -107,6 +108,23 @@
                     <div class="card-header">
                         <h3><i class='bx bx-bar-chart-alt'></i> Analysis and Prioritization</h3>
                         <p>Optimized maintenance scheduling based on severity scoring</p>
+                                    <div style="margin: 30px 0">
+                <label
+                    for="maintenanceBudget"
+                    style="display: block; margin-bottom: 10px; font-weight: 600"
+                    >Available Maintenance Time (days):</label
+                >
+                <input
+                    type="number"
+                    id="maintenanceBudget"
+                    value="180"
+                    min="1"
+                    style="width: 200px; margin-right: 20px"
+                />
+                <button class="btn-success" onclick="runOptimization()">
+                    🚀 Run DaangMatino Analysis
+                </button>
+            </div>
                     </div>
                     <div class="leaderboard-content">
                         <div id="quicksortResultsList" class="leaderboard-list">

@@ -812,8 +812,22 @@ function knapsackOptimization(reports, timeBudget) {
     };
 }
 
-// QuickSort Implementation
-function quickSort(arr) {
+// Enhanced QuickSort Implementation with comprehensive prioritization
+function quickSortPrioritization(arr) {
+    if (arr.length <= 1) {
+        return arr;
+    }
+
+    // Calculate comprehensive priority score for each report
+    const reportsWithPriority = arr.map(report => ({
+        ...report,
+        priorityScore: calculateComprehensivePriorityScore(report)
+    }));
+
+    return quickSortRecursive(reportsWithPriority);
+}
+
+function quickSortRecursive(arr) {
     if (arr.length <= 1) {
         return arr;
     }
@@ -823,14 +837,60 @@ function quickSort(arr) {
     const right = [];
 
     for (let i = 1; i < arr.length; i++) {
-        if (arr[i].severityScore > pivot.severityScore) {
+        if (arr[i].priorityScore > pivot.priorityScore) {
             left.push(arr[i]);
         } else {
             right.push(arr[i]);
         }
     }
 
-    return [...quickSort(left), pivot, ...quickSort(right)];
+    return [...quickSortRecursive(left), pivot, ...quickSortRecursive(right)];
+}
+
+// Calculate comprehensive priority score (matches admin dashboard logic)
+function calculateComprehensivePriorityScore(report) {
+    // 1. Road Type Score (40% weight)
+    const roadTypeScore = roadTypeScores[report.roadType] || 25;
+    
+    // 2. Severity Factor (30% weight)
+    const severityWeights = {
+        'high': 100,
+        'medium': 60,
+        'low': 30
+    };
+    const severityScore = severityWeights[report.severity] || 30;
+    
+    // 3. Defect Urgency Score (20% weight)
+    let defectUrgencyScore = 0;
+    const defects = Array.isArray(report.defects) ? report.defects : [];
+    const urgentDefects = ['Potholes', 'Open Manhole', 'Unmaintained Bridges', 'Alligator Cracks'];
+    
+    defects.forEach(defect => {
+        if (urgentDefects.includes(defect)) {
+            defectUrgencyScore += 25;
+        } else {
+            defectUrgencyScore += 10;
+        }
+    });
+    defectUrgencyScore = Math.min(100, defectUrgencyScore);
+    
+    // 4. Time Factor (10% weight) - favor reports that can be completed quickly
+    const timeFactor = Math.max(10, 100 - (report.responseTime || 7) * 2);
+    
+    // Calculate weighted priority score
+    const priorityScore = (
+        roadTypeScore * 0.40 +
+        severityScore * 0.30 +
+        defectUrgencyScore * 0.20 +
+        timeFactor * 0.10
+    );
+    
+    return Math.round(priorityScore);
+}
+
+// QuickSort Implementation (legacy for backward compatibility)
+function quickSort(arr) {
+    return quickSortPrioritization(arr);
 }
 
 // Run optimization
@@ -867,17 +927,27 @@ function runOptimization() {
             .join("")}
     `;
 
-    // QuickSort optimization
-    const sortedReports = quickSort([...knapsackResult.selectedReports]);
+    // QuickSort optimization with enhanced prioritization
+    const sortedReports = quickSortPrioritization([...knapsackResult.selectedReports]);
     document.getElementById("quicksortResults").innerHTML = `
-        <p><strong>Prioritized Maintenance Order:</strong></p>
+        <p><strong>Prioritized Maintenance Order (Enhanced Algorithm):</strong></p>
         ${sortedReports
             .map(
                 (r, i) => `
                 <div class="road-item">
                     <strong>Priority ${i + 1}: ${r.roadName}</strong><br>
-                    Severity: ${r.severity} | Score: ${r.severityScore}<br>
-                    Response Time: ${r.responseTime} days
+                    Severity: ${r.severity} | Priority Score: ${r.priorityScore || r.severityScore}<br>
+                    Response Time: ${r.responseTime} days | Defects: ${Array.isArray(r.defects) ? r.defects.join(', ') : r.defects}<br>
+                    <div class="score-breakdown">
+                        <div class="score-row">
+                            <span>Road Type (${r.roadType}):</span>
+                            <span class="score-value">${roadTypeScores[r.roadType] || 25}</span>
+                        </div>
+                        <div class="score-row">
+                            <span>Severity Weight:</span>
+                            <span class="score-value">${r.severity === 'high' ? 100 : r.severity === 'medium' ? 60 : 30}</span>
+                        </div>
+                    </div>
                 </div>
             `
             )
