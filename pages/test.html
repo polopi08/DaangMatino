@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DaangMatino - Road Maintenance Planning System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, rgba(250, 250, 210, 0.3), rgba(255, 211, 0, 0.2), rgba(250, 250, 210, 0.4), rgba(255, 211, 0, 0.15));
+            background-size: 600% 600%;
+            animation: gradientShift 25s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 100px; /* Account for fixed header */
+        }
+
+        /* Header Styles */
+        .header-sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .navbar {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .navbar li a:hover,
+        .navbar li a.active {
+            color: #FFD300;
+        }
+
+        .navbar li a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #FFD300;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .reportButton button {
+            background: linear-gradient(45deg, #FFD300, #FAFAD2);
+            color: #333;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 211, 0, 0.3);
+        }
+
+        .reportButton button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 211, 0, 0.4);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #333;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                position: fixed;
+                top: 70px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: rgba(255, 255, 255, 0.98);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding-top: 50px;
+                transition: right 0.3s ease;
+            }
+
+            .navbar.active {
+                right: 0;
+            }
+
+            .navbar li {
+                margin: 20px 0;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hamburger.active span:nth-child(1) {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active span:nth-child(3) {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 100% 25%;
+            }
+            50% {
+                background-position: 100% 100%;
+            }
+            75% {
+                background-position: 0% 75%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: rgba(255, 211, 0, 0.1);
+            border-radius: 15px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #FFD300, #FAFAD2);
+            color: #333;
+            box-shadow: 0 5px 15px rgba(255, 211, 0, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .report-form {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 12px 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #FFD300;
+            box-shadow: 0 0 0 3px rgba(255, 211, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #FFD300, #FAFAD2);
+            color: #333;
+            box-shadow: 0 4px 15px rgba(255, 211, 0, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 211, 0, 0.6);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #FFD300, #FAFAD2);
+            color: #333;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+
+        .reports-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e6ed;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: linear-gradient(45deg, #333, #555);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background: rgba(255, 211, 0, 0.05);
+        }
+
+        .severity-critical {
+            background: #ff4757;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .severity-high {
+            background: #ff6348;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .severity-medium {
+            background: #ffa502;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .severity-low {
+            background: #2ed573;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .road-national {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+        .road-municipal {
+            background: #f39c12;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+        .road-barangay {
+            background: #27ae60;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+        .road-bypass {
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .algorithm-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .result-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+        }
+
+        .knapsack-panel {
+            border-left-color: #FFD300;
+        }
+        .dijkstra-panel {
+            border-left-color: #FAFAD2;
+        }
+        .quicksort-panel {
+            border-left-color: #333;
+        }
+
+        .result-panel h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .road-item {
+            background: rgba(255, 211, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #FFD300;
+            transition: all 0.3s ease;
+        }
+
+        .road-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(255, 211, 0, 0.2);
+        }
+
+        .route-visualization {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px dashed #FFD300;
+        }
+
+        .route-step {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .route-arrow {
+            color: #FFD300;
+            font-size: 1.2rem;
+            margin: 0 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: rgba(255, 211, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        #mapContainer {
+            grid-column: 1 / -1;
+            height: 400px;
+            margin-top: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid #e0e6ed;
+            position: relative;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            max-width: 300px;
+        }
+
+        .node-marker {
+            background: #FFD300;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .route-line {
+            background: #ff6b6b;
+            height: 3px;
+            display: inline-block;
+            margin: 0 5px;
+            vertical-align: middle;
+            width: 30px;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .map-control-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .map-control-btn.active {
+            background: linear-gradient(45deg, #FFD300, #FAFAD2);
+            color: #333;
+            box-shadow: 0 3px 10px rgba(255, 211, 0, 0.3);
+        }
+
+        .selection-info {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .defect-checkbox {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .defect-checkbox input {
+            margin-right: 10px;
+        }
+
+        .defects-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .visualization-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .visualization-header {
+            background: linear-gradient(45deg, #333, #555);
+            color: white;
+            padding: 25px 40px;
+            text-align: center;
+        }
+
+        .visualization-content {
+            padding: 30px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f4f8;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            background: linear-gradient(45deg, #FFD300, #FAFAD2);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        #network-map {
+            height: 500px;
+            border-radius: 12px;
+            background: #f8f9fa;
+            border: 1px solid #e0e6ed;
+        }
+
+        .slider-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .day-display {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            background: rgba(255, 211, 0, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 20px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #2ed573, #ffa502, #ff4757);
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #FFD300;
+            border: 3px solid white;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .road-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f0f7ff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .road-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .road-item-vis {
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid #FFD300;
+        }
+
+        .road-item-vis:hover {
+            background: rgba(255, 211, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .road-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .road-days {
+            background: #333;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .road-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background: #2ed573;
+        }
+        .status-pending {
+            background: #ffa502;
+        }
+        .status-completed {
+            background: #3498db;
+        }
+
+        .timeline {
+            margin-top: 30px;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timeline-title {
+            font-size: 1.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .timeline-steps {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px 0;
+            gap: 15px;
+        }
+
+        .timeline-step {
+            min-width: 200px;
+            background: rgba(255, 211, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #FFD300;
+        }
+
+        .step-day {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .step-road {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .step-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .status-planned {
+            background: rgba(255, 211, 0, 0.2);
+            color: #333;
+        }
+
+        .status-in-progress {
+            background: #fff4e6;
+            color: #ff9100;
+        }
+
+        .status-complete {
+            background: #d7f9e8;
+            color: #00b74a;
+        }
+
+        .visualization-footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #e0e6ed;
+        }
+
+        .score-breakdown {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .score-value {
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .algorithm-results {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .map-overlay {
+                max-width: 200px;
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+
+            .map-controls {
+                flex-direction: column;
+            }
+
+            .defects-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .animate-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header-sticky"> 
+        <a href="landingPage.html" class="logo">
+            <img src="../assets/logowDAA.png" alt="Company Logo">
+            DaangMatino 
+        </a>
+        <ul class="navbar">
+            <li><a href="landingPage.html">Home</a></li>
+            <li><a href="landingPage.html#features">Features</a></li>
+            <li><a href="#" class="active">Analytics</a></li>
+            <li><a href="landingPage.html#about">About Us</a></li>
+            <li><a href="landingPage.html#contact">Contact</a></li>
+            <li><a href="maps.html">Maps</a></li>
+        </ul>
+        <div class="nav-actions">
+            <div class="reportButton">
+                <a href="reportPage.html"><button>Report Road Damage</button></a> 
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('report')">
+                📋 Report Defects
+            </div>
+            <div class="tab" onclick="switchTab('analysis')">
+                🔬 Analysis & Prioritization
+            </div>
+            <div class="tab" onclick="switchTab('routes')">
+                🗺️ Maintenance Visualization
+            </div>
+        </div>
+
+        <!-- Report Tab -->
+        <div id="report-tab" class="tab-content active">
+            <div class="report-form">
+                <h3>🚨 Report Road Defect</h3>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="roadName">Road Name/Location</label>
+                        <input
+                            type="text"
+                            id="roadName"
+                            placeholder="Select nodes on map"
+                            readonly
+                        />
+                    </div>
+                    <div class="input-group">
+                        <label for="detectedRoadType">Detected Road Type</label>
+                        <input
+                            type="text"
+                            id="detectedRoadType"
+                            placeholder="Will be detected from OSM"
+                            readonly
+                        />
+                    </div>
+                    <div class="input-group">
+                        <label for="severity">Severity Level</label>
+                        <select id="severity">
+                            <option value="critical">Critical (Immediate danger)</option>
+                            <option value="high">High (Major disruption)</option>
+                            <option value="medium">Medium (Moderate impact)</option>
+                            <option value="low">Low (Minor issue)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="responseTime">Estimated Response Time (days)</label>
+                        <input
+                            type="number"
+                            id="responseTime"
+                            min="1"
+                            value="0"
+                            readonly
+                        />
+                    </div>
+                </div>
+
+                <div class="input-group" style="grid-column: 1 / -1">
+                    <label>Defect Types (Select all that apply)</label>
+                    <div class="defects-container" id="defectsContainer">
+                        <!-- Defect checkboxes will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Map Container -->
+                <div id="mapContainer">
+                    <div class="map-overlay">
+                        <h4>OSM Road Selection</h4>
+                        <div id="selectionInfo" class="selection-info">
+                            Click "Select Nodes" to start
+                        </div>
+                        <div class="map-controls">
+                            <button
+                                id="pointBtn"
+                                class="map-control-btn active"
+                                onclick="setMode('node')"
+                            >
+                                📍 Select Nodes
+                            </button>
+                            <button
+                                class="map-control-btn btn-danger"
+                                onclick="clearSelection()"
+                            >
+                                ❌ Clear Selection
+                            </button>
+                        </div>
+                        <p style="margin-top: 10px; font-size: 0.9em">
+                            <span class="node-marker"></span> = Node
+                            <span class="route-line"></span> = Road Segment
+                        </p>
+                    </div>
+                    <div id="map"></div>
+                </div>
+
+                <div class="input-group" style="margin-top: 20px">
+                    <label for="description">Additional Description</label>
+                    <textarea
+                        id="description"
+                        placeholder="Describe the road condition, location landmarks, and any additional details..."
+                    ></textarea>
+                </div>
+                <button
+                    class="btn-primary"
+                    onclick="submitReport()"
+                    style="margin-top: 20px"
+                >
+                    Submit Report
+                </button>
+            </div>
+
+            <div class="reports-table">
+                <h3
+                    style="
+                        padding: 20px;
+                        margin: 0;
+                        background: #f8f9fa;
+                        border-bottom: 1px solid #e0e6ed;
+                    "
+                >
+                    📊 Community Reports
+                </h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Road Name</th>
+                            <th>Type</th>
+                            <th>Defects</th>
+                            <th>Severity</th>
+                            <th>Response Time</th>
+                            <th>Reports Count</th>
+                            <th>Severity Score</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsBody">
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                No reports submitted yet. Be the first to report a road
+                                defect!
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Analysis Tab -->
+        <div id="analysis-tab" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalReports">0</div>
+                    <div class="stat-label">Total Reports</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="criticalIssues">0</div>
+                    <div class="stat-label">Critical Issues</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="avgResponseTime">0</div>
+                    <div class="stat-label">Avg Response Time (days)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="budgetUtilization">0%</div>
+                    <div class="stat-label">Budget Utilization</div>
+                </div>
+            </div>
+
+            <div style="margin: 30px 0">
+                <label
+                    for="maintenanceBudget"
+                    style="display: block; margin-bottom: 10px; font-weight: 600"
+                    >Available Maintenance Time (days):</label
+                >
+                <input
+                    type="number"
+                    id="maintenanceBudget"
+                    value="180"
+                    min="1"
+                    style="width: 200px; margin-right: 20px"
+                />
+                <button class="btn-success" onclick="runOptimization()">
+                    🚀 Run DaangMatino Analysis
+                </button>
+            </div>
+
+            <div
+                class="algorithm-results"
+                id="algorithmResults"
+                style="display: none"
+            >
+                <!-- Knapsack Results -->
+                <div class="result-panel knapsack-panel">
+                    <h3>🎒 Knapsack Optimization</h3>
+                    <p>
+                        <strong>Purpose:</strong> Select optimal subset of roads that can
+                        be fixed within available time budget
+                    </p>
+                    <div id="knapsackResults"></div>
+                </div>
+
+                <!-- QuickSort Results -->
+                <div class="result-panel quicksort-panel">
+                    <h3>⚡ QuickSort Prioritization</h3>
+                    <p>
+                        <strong>Purpose:</strong> Sort selected roads by priority
+                        considering severity, traffic, and community impact
+                    </p>
+                    <div id="quicksortResults"></div>
+                </div>
+
+                <!-- Dijkstra Results -->
+                <div class="result-panel dijkstra-panel">
+                    <h3>🗺️ Dijkstra Route Planning</h3>
+                    <p>
+                        <strong>Purpose:</strong> Find optimal alternative routes during
+                        maintenance periods
+                    </p>
+                    <div id="dijkstraResults"></div>
+                </div>
+            </div>
+
+            <!-- Maintenance Schedule -->
+            <div id="maintenanceSchedule" class="empty-state">
+                Run the DaangMatino analysis first to generate maintenance schedules.
+            </div>
+        </div>
+
+        <!-- Routes Tab - Replaced with Visualization -->
+        <div id="routes-tab" class="tab-content">
+            <div class="visualization-container">
+                <div class="visualization-header">
+                    <h1><i class="fas fa-road"></i> Road Network Maintenance</h1>
+                    <p class="subtitle">
+                        Visualize road availability during maintenance period
+                    </p>
+                </div>
+
+                <div class="visualization-content">
+                    <div class="dashboard">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Road Network Visualization</h2>
+                                <div class="card-icon">
+                                    <i class="fas fa-map"></i>
+                                </div>
+                            </div>
+                            <div id="network-map"></div>
+
+                            <div class="slider-container">
+                                <div class="slider-header">
+                                    <h3>Adjust Maintenance Day</h3>
+                                    <div class="day-display">
+                                        Day <span id="current-day">15</span> of 30
+                                    </div>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max="30"
+                                    value="15"
+                                    class="slider"
+                                    id="day-slider"
+                                />
+                                <div class="legend">
+                                    <div class="legend-item">
+                                        <div
+                                            class="legend-color"
+                                            style="background-color: #2ed573"
+                                        ></div>
+                                        <span>Available</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div
+                                            class="legend-color"
+                                            style="background-color: #ffa502"
+                                        ></div>
+                                        <span>In Maintenance</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div
+                                            class="legend-color"
+                                            style="background-color: #ff4757"
+                                        ></div>
+                                        <span>Not Accessible</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="road-stats">
+                                <div class="stat-card">
+                                    <div>
+                                        <i
+                                            class="fas fa-road"
+                                            style="color: #2ed573; font-size: 1.8rem"
+                                        ></i>
+                                    </div>
+                                    <div class="stat-value" id="available-roads">18</div>
+                                    <div class="stat-label">Available Roads</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div>
+                                        <i
+                                            class="fas fa-tools"
+                                            style="color: #ffa502; font-size: 1.8rem"
+                                        ></i>
+                                    </div>
+                                    <div class="stat-value" id="maintenance-roads">5</div>
+                                    <div class="stat-label">In Maintenance</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div>
+                                        <i
+                                            class="fas fa-exclamation-triangle"
+                                            style="color: #ff4757; font-size: 1.8rem"
+                                        ></i>
+                                    </div>
+                                    <div class="stat-value" id="blocked-roads">7</div>
+                                    <div class="stat-label">Blocked Roads</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Road Maintenance Schedule</h2>
+                                <div class="card-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                            </div>
+                            <div class="road-list" id="visualization-road-list">
+                                <div class="road-item-vis">
+                                    <div>
+                                        <span class="road-status status-completed"></span>
+                                        <span class="road-name">National Highway 1</span>
+                                    </div>
+                                    <div class="road-days">Days 1-7</div>
+                                </div>
+                                <div class="road-item-vis">
+                                    <div>
+                                        <span class="road-status status-completed"></span>
+                                        <span class="road-name">Municipal Road B</span>
+                                    </div>
+                                    <div class="road-days">Days 3-10</div>
+                                </div>
+                                <div class="road-item-vis">
+                                    <div>
+                                        <span class="road-status status-completed"></span>
+                                        <span class="road-name">Bypass Road East</span>
+                                    </div>
+                                    <div class="road-days">Days 5-12</div>
+                                </div>
+                                <div class="road-item-vis">
+                                    <div>
+                                        <span class="road-status status-active"></span>
+                                        <span class="road-name">Barangay Access Road</span>
+                                    </div>
+                                    <div class="road-days">Days 10-18</div>
+                                </div>
+                                <div class="road-item-vis">
+                                    <div>
+                                        <span class="road-status status-active"></span>
+                                        <span class="road-name">National Highway 2</span>
+                                    </div>
+                                    <div class="road-days">Days 12-20</div>
+                                </div>
+                                <div class="road-item-vis">
+                                    <div>
+                                        <span class="road-status status-pending"></span>
+                                        <span class="road-name">Municipal Road C</span>
+                                    </div>
+                                    <div class="road-days">Days 18-25</div>
+                                </div>
+                                <div class="road-item-vis">
+                                    <div>
+                                        <span class="road-status status-pending"></span>
+                                        <span class="road-name">Barangay Service Road</span>
+                                    </div>
+                                    <div class="road-days">Days 20-27</div>
+                                </div>
+                                <div class="road-item-vis">
+                                    <div>
+                                        <span class="road-status status-pending"></span>
+                                        <span class="road-name">Bypass Road West</span>
+                                    </div>
+                                    <div class="road-days">Days 22-30</div>
+                                </div>
+                            </div>
+
+                            <div class="card-header" style="margin-top: 20px">
+                                <h2 class="card-title">Maintenance Summary</h2>
+                            </div>
+                            <div class="road-stats">
+                                <div class="stat-card">
+                                    <div>
+                                        <i
+                                            class="fas fa-check-circle"
+                                            style="color: #2ed573; font-size: 1.8rem"
+                                        ></i>
+                                    </div>
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">Completed</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div>
+                                        <i
+                                            class="fas fa-tools"
+                                            style="color: #ffa502; font-size: 1.8rem"
+                                        ></i>
+                                    </div>
+                                    <div class="stat-value">2</div>
+                                    <div class="stat-label">In Progress</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div>
+                                        <i
+                                            class="fas fa-clock"
+                                            style="color: #3498db; font-size: 1.8rem"
+                                        ></i>
+                                    </div>
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">Upcoming</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline">
+                        <div class="timeline-header">
+                            <h2 class="timeline-title">Maintenance Timeline</h2>
+                            <div class="day-display">
+                                Day <span id="timeline-day">15</span> of 30
+                            </div>
+                        </div>
+                        <div class="timeline-steps">
+                            <div class="timeline-step">
+                                <div class="step-day">Day 1-7</div>
+                                <div class="step-road">National Highway 1</div>
+                                <div class="step-status status-complete">Completed</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="step-day">Day 3-10</div>
+                                <div class="step-road">Municipal Road B</div>
+                                <div class="step-status status-complete">Completed</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="step-day">Day 5-12</div>
+                                <div class="step-road">Bypass Road East</div>
+                                <div class="step-status status-complete">Completed</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="step-day">Day 10-18</div>
+                                <div class="step-road">Barangay Access Road</div>
+                                <div class="step-status status-in-progress">In Progress</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="step-day">Day 12-20</div>
+                                <div class="step-road">National Highway 2</div>
+                                <div class="step-status status-in-progress">In Progress</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="step-day">Day 18-25</div>
+                                <div class="step-road">Municipal Road C</div>
+                                <div class="step-status status-planned">Planned</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="step-day">Day 20-27</div>
+                                <div class="step-road">Barangay Service Road</div>
+                                <div class="step-status status-planned">Planned</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="step-day">Day 22-30</div>
+                                <div class="step-road">Bypass Road West</div>
+                                <div class="step-status status-planned">Planned</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visualization-footer">
+                    <p>Road Maintenance Visualization System | © 2023 DaangMatino</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Hamburger menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const navbar = document.querySelector('.navbar');
+            
+            if (hamburger) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('active');
+                    navbar.classList.toggle('active');
+                });
+
+                // Close menu when clicking on a nav link
+                const navLinks = document.querySelectorAll('.navbar a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.classList.remove('active');
+                        navbar.classList.remove('active');
+                    });
+                });
+            }
+        });
+
+        // Map variables
+        let map;
+        let drawnItems = new L.FeatureGroup();
+        let currentMode = "node";
+        let roadNodes = [];
+        let roadPolylines = [];
+        let selectedRoad = null;
+
+        // Report data
+        let reports = [];
+        let reportIdCounter = 1;
+        let optimizedSchedule = [];
+        let alternativeRoutes = [];
+
+        // Road Type Scores
+        const roadTypeScores = {
+            "national road": 100,
+            "municipal": 75,
+            "barangay road": 50,
+            "bypass road": 25
+        };
+
+        // Defects mapping with response times and severity scores
+        const defectData = {
+            "Potholes": { days: 3 },
+            "Alligator Cracks": { days: 3 },
+            "Major Scaling": { days: 30 },
+            "Shoving and Corrugation": { days: 10 },
+            "Pumping and Depression": { days: 30 },
+            "No/Faded Road Markings": { days: 15 },
+            "Defects on Shoulders": { days: 7 },
+            "Lush Vegetation": { days: 3 },
+            "Clogged Drains": { days: 3 },
+            "Open Manhole": { days: 10 },
+            "No/Inadequate Sealant in Joints": { days: 3 },
+            "Cracks": { days: 3 },
+            "Raveling": { days: 7 },
+            "Unmaintained Signages and Road Markers": { days: 15 },
+            "Unmaintained Bridges": { days: 15 },
+            "Unmaintained Guardrails": { days: 15 }
+        };
+
+        // Sample data based on DPWH standards
+        const sampleReports = [
+            {
+                roadName: "EDSA Northbound KM 12",
+                roadType: "national road",
+                defects: ["Potholes", "Cracks"],
+                severity: "critical",
+                responseTime: 6,
+                description: "Large pothole causing accidents",
+                latlng: [14.5995, 120.9842],
+                severityScore: 0,
+                reportCount: 1
+            },
+            {
+                roadName: "Quezon Avenue",
+                roadType: "municipal",
+                defects: ["Clogged Drains", "Lush Vegetation"],
+                severity: "high",
+                responseTime: 6,
+                description: "Severe flooding during rainy season",
+                latlng: [14.65, 121.03],
+                severityScore: 0,
+                reportCount: 1
+            },
+            {
+                roadName: "Barangay 123 Access Road",
+                roadType: "barangay road",
+                defects: ["Raveling", "No/Faded Road Markings"],
+                severity: "medium",
+                responseTime: 10,
+                description: "Surface deterioration and faded lane markings",
+                latlng: [14.58, 120.98],
+                severityScore: 0,
+                reportCount: 1
+            },
+            {
+                roadName: "C5 Bypass Road",
+                roadType: "bypass road",
+                defects: ["Potholes", "Alligator Cracks"],
+                severity: "critical",
+                responseTime: 9,
+                description: "Multiple large potholes on northbound lane",
+                latlng: [14.61, 121.06],
+                severityScore: 0,
+                reportCount: 1
+            },
+            {
+                roadName: "Taft Avenue Bridge",
+                roadType: "national road",
+                defects: ["Unmaintained Bridges", "Open Manhole"],
+                severity: "high",
+                responseTime: 25,
+                description: "Bridge structural damage observed",
+                latlng: [14.56, 120.99],
+                severityScore: 0,
+                reportCount: 1
+            }
+        ];
+
+        // Initialize map
+        function initMap() {
+            // Set initial view to Philippines
+            map = L.map("map").setView([14.5995, 120.9842], 13);
+
+            // Add OSM tile layer
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }).addTo(map);
+
+            // Add feature group to map
+            drawnItems.addTo(map);
+        }
+
+        // Initialize the application
+        window.onload = function () {
+            // Load sample data
+            sampleReports.forEach((report) => {
+                reports.push({
+                    id: reportIdCounter++,
+                    ...report,
+                    reportCount: Math.floor(Math.random() * 50) + 1,
+                    severityScore: calculateSeverityScore(report),
+                });
+            });
+            updateReportsTable();
+            updateStats();
+
+            // Initialize the map
+            initMap();
+
+            // Set event listeners
+            map.on("click", handleMapClick);
+
+            // Generate defect checkboxes
+            generateDefectCheckboxes();
+
+            // Initialize visualization
+            initVisualization();
+        };
+
+        // Generate defect checkboxes
+        function generateDefectCheckboxes() {
+            const container = document.getElementById("defectsContainer");
+            container.innerHTML = "";
+
+            for (const defect in defectData) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "defect-checkbox";
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.id = `defect-${defect.replace(/\s+/g, "-").toLowerCase()}`;
+                checkbox.value = defect;
+                checkbox.onchange = updateResponseTime;
+
+                const label = document.createElement("label");
+                label.htmlFor = checkbox.id;
+                // Only show defect name and days
+                label.textContent = `${defect} (${defectData[defect].days} days)`;
+
+                wrapper.appendChild(checkbox);
+                wrapper.appendChild(label);
+                container.appendChild(wrapper);
+            }
+        }
+
+        // Update response time based on selected defects
+        function updateResponseTime() {
+            const checkboxes = document.querySelectorAll(
+                '#defectsContainer input[type="checkbox"]'
+            );
+            let totalDays = 0;
+
+            checkboxes.forEach((checkbox) => {
+                if (checkbox.checked) {
+                    totalDays += defectData[checkbox.value].days;
+                }
+            });
+
+            document.getElementById("responseTime").value = totalDays;
+        }
+
+        // Handle map clicks
+        function handleMapClick(e) {
+            if (currentMode === "node") {
+                // Add node marker
+                const marker = L.marker(e.latlng, {
+                    draggable: true,
+                })
+                    .addTo(drawnItems)
+                    .on("dragend", function (event) {
+                        // Update position when marker is dragged
+                        const marker = event.target;
+                        const position = marker.getLatLng();
+
+                        // Update roadNodes array
+                        const nodeIndex = roadNodes.findIndex(
+                            (node) => node.lat === position.lat && node.lng === position.lng
+                        );
+                        if (nodeIndex !== -1) {
+                            roadNodes[nodeIndex] = position;
+                        }
+
+                        // Recreate the road if we have at least 2 nodes
+                        if (roadNodes.length > 1) {
+                            createRoadFromNodes();
+                        }
+                    });
+
+                roadNodes.push(e.latlng);
+
+                // Add node number
+                marker
+                    .bindTooltip(`Node ${roadNodes.length}`, {
+                        permanent: true,
+                        direction: "right",
+                    })
+                    .openTooltip();
+
+                // If we have at least 2 nodes, create the road
+                if (roadNodes.length >= 2) {
+                    createRoadFromNodes();
+                }
+
+                updateSelectionInfo(
+                    `Selected ${roadNodes.length} node${roadNodes.length > 1 ? "s" : ""}`
+                );
+
+                // Update road name
+                if (roadNodes.length === 1) {
+                    reverseGeocode(roadNodes[0]).then((roadName) => {
+                        document.getElementById("roadName").value = roadName;
+                    });
+                } else if (roadNodes.length >= 2) {
+                    reverseGeocode(roadNodes[0]).then((startName) => {
+                        reverseGeocode(roadNodes[roadNodes.length - 1]).then(
+                            (endName) => {
+                                document.getElementById(
+                                    "roadName"
+                                ).value = `${startName} to ${endName}`;
+                            }
+                        );
+                    });
+                }
+
+                // Detect road type from OSM
+                detectRoadType();
+            }
+        }
+
+        // Detect road type from OSM
+        async function detectRoadType() {
+            if (roadNodes.length === 0) return;
+
+            // Use the first node to detect road type
+            const node = roadNodes[0];
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${node.lat}&lon=${node.lng}`
+                );
+                const data = await response.json();
+
+                let roadType = "Unknown";
+
+                if (data.address) {
+                    // Try to get the road classification
+                    if (data.address.road) {
+                        // Classify based on road name patterns
+                        if (
+                            data.address.road.includes("Highway") ||
+                            data.address.road.includes("Expressway")
+                        ) {
+                            roadType = "national road";
+                        } else if (
+                            data.address.road.includes("Avenue") ||
+                            data.address.road.includes("Boulevard")
+                        ) {
+                            roadType = "municipal";
+                        } else if (
+                            data.address.road.includes("Street") ||
+                            data.address.road.includes("Road")
+                        ) {
+                            roadType = "barangay road";
+                        } else {
+                            roadType = "bypass road";
+                        }
+                    }
+
+                    // Try to get from OSM tags if available
+                    if (data.extratags) {
+                        if (
+                            data.extratags.highway === "motorway" ||
+                            data.extratags.highway === "trunk"
+                        ) {
+                            roadType = "national road";
+                        } else if (data.extratags.highway === "primary") {
+                            roadType = "national road";
+                        } else if (data.extratags.highway === "secondary") {
+                            roadType = "municipal";
+                        } else if (data.extratags.highway === "tertiary") {
+                            roadType = "barangay road";
+                        } else if (data.extratags.highway === "unclassified" ||
+                                   data.extratags.highway === "service") {
+                            roadType = "bypass road";
+                        }
+                    }
+                }
+
+                document.getElementById("detectedRoadType").value = roadType;
+            } catch (error) {
+                console.error("Road type detection error:", error);
+                document.getElementById("detectedRoadType").value = "Unknown";
+            }
+        }
+
+        // Create road from selected nodes using OSM routing
+        function createRoadFromNodes() {
+            // Clear previous road if exists
+            if (selectedRoad) {
+                drawnItems.removeLayer(selectedRoad);
+            }
+
+            // Remove any existing polylines
+            roadPolylines.forEach((polyline) => {
+                drawnItems.removeLayer(polyline);
+            });
+            roadPolylines = [];
+
+            // Create route between consecutive nodes
+            for (let i = 0; i < roadNodes.length - 1; i++) {
+                getOSRMRoute(roadNodes[i], roadNodes[i + 1])
+                    .then((route) => {
+                        if (route) {
+                            const polyline = L.polyline(route, {
+                                color: "#ff6b6b",
+                                weight: 4,
+                            }).addTo(drawnItems);
+                            roadPolylines.push(polyline);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Routing error:", error);
+                        // Fallback: straight line
+                        const polyline = L.polyline([roadNodes[i], roadNodes[i + 1]], {
+                            color: "#3498db",
+                            weight: 4,
+                            dashArray: "5, 10",
+                        }).addTo(drawnItems);
+                        roadPolylines.push(polyline);
+                    });
+            }
+        }
+
+        // Get OSRM route between two points
+        async function getOSRMRoute(start, end) {
+            const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.code === "Ok" && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    const coordinates = route.geometry.coordinates.map((coord) => [
+                        coord[1],
+                        coord[0],
+                    ]);
+                    return coordinates;
+                }
+            } catch (error) {
+                console.error("OSRM request failed:", error);
+                throw error;
+            }
+        }
+
+        // Reverse geocode coordinates to road name
+        async function reverseGeocode(latlng) {
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`
+                );
+                const data = await response.json();
+
+                if (data.address) {
+                    return (
+                        data.address.road ||
+                        data.address.highway ||
+                        data.address.suburb ||
+                        "Unnamed Road"
+                    );
+                }
+                return "Unknown Road";
+            } catch (error) {
+                console.error("Geocoding error:", error);
+                return "Unknown Road";
+            }
+        }
+
+        // Update selection info display
+        function updateSelectionInfo(text) {
+            document.getElementById("selectionInfo").innerHTML = text;
+        }
+
+        // Set interaction mode
+        function setMode(mode) {
+            currentMode = mode;
+            updateSelectionInfo(
+                mode === "node"
+                    ? "Click on the map to select nodes"
+                    : "Click on the map to start drawing a road"
+            );
+        }
+
+        // Clear current selection
+        function clearSelection() {
+            drawnItems.clearLayers();
+            roadNodes = [];
+            roadPolylines = [];
+            selectedRoad = null;
+            document.getElementById("roadName").value = "";
+            document.getElementById("detectedRoadType").value = "";
+            updateSelectionInfo("Click on the map to select nodes");
+
+            // Clear defect checkboxes
+            const checkboxes = document.querySelectorAll(
+                '#defectsContainer input[type="checkbox"]'
+            );
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = false;
+            });
+            document.getElementById("responseTime").value = "0";
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll(".tab-content").forEach((content) => {
+                content.classList.remove("active");
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll(".tab").forEach((tab) => {
+                tab.classList.remove("active");
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName + "-tab").classList.add("active");
+
+            // Add active class to selected tab
+            event.target.classList.add("active");
+        }
+
+        // Submit report
+        function submitReport() {
+            const roadName = document.getElementById("roadName").value.trim();
+            const roadType = document.getElementById("detectedRoadType").value;
+            const severity = document.getElementById("severity").value;
+            const responseTime = parseInt(
+                document.getElementById("responseTime").value
+            );
+            const description = document.getElementById("description").value.trim();
+
+            if (!roadName || !responseTime || responseTime === 0) {
+                alert("Please select defects and ensure road is properly selected");
+                return;
+            }
+
+            // Get selected defects
+            const selectedDefects = [];
+            const checkboxes = document.querySelectorAll(
+                '#defectsContainer input[type="checkbox"]:checked'
+            );
+            checkboxes.forEach((checkbox) => {
+                selectedDefects.push(checkbox.value);
+            });
+
+            // Check if road already exists
+            const existingReport = reports.find(
+                (r) => r.roadName.toLowerCase() === roadName.toLowerCase()
+            );
+
+            if (existingReport) {
+                existingReport.reportCount++;
+                if (
+                    getSeverityScore(severity) >
+                    getSeverityScore(existingReport.severity)
+                ) {
+                    existingReport.severity = severity;
+                    existingReport.defects = selectedDefects;
+                    existingReport.responseTime = responseTime;
+                    existingReport.description = description;
+                }
+            } else {
+                const report = {
+                    id: reportIdCounter++,
+                    roadName,
+                    roadType,
+                    defects: selectedDefects,
+                    severity,
+                    responseTime,
+                    description,
+                    reportCount: 1,
+                    severityScore: 0,
+                };
+                reports.push(report);
+            }
+
+            updateReportsTable();
+            updateStats();
+            clearReportForm();
+
+            alert("Report submitted successfully!");
+        }
+
+        // Clear report form
+        function clearReportForm() {
+            document.getElementById("description").value = "";
+            document.getElementById("responseTime").value = "0";
+            clearSelection();
+        }
+
+        // Remove report
+        function removeReport(id) {
+            reports = reports.filter((r) => r.id !== id);
+            updateReportsTable();
+            updateStats();
+        }
+
+        // Get severity score
+        function getSeverityScore(severity) {
+            const scores = { critical: 4, high: 3, medium: 2, low: 1 };
+            return scores[severity] || 0;
+        }
+
+        // Calculate severity score
+        function calculateSeverityScore(report) {
+            // Road Type Score (RTS)
+            const rts = roadTypeScores[report.roadType] || 0;
+            
+            // Road Defect Score (RDS) - sum of severity scores for all defects
+            let rds = 0;
+            report.defects.forEach(defect => {
+                rds += defectData[defect]?.severity || 0;
+            });
+            
+            // Report Frequency Score (RFS) - normalized to 0-100
+            const rfs = Math.min(100, report.reportCount * 5);
+            
+            // Calculate severity score
+            const severityScore = (rts * 0.40) + (rds * 0.50) + (rfs * 0.10);
+            
+            return Math.round(severityScore);
+        }
+
+        // Update reports table
+        function updateReportsTable() {
+            const tbody = document.getElementById("reportsBody");
+
+            if (reports.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="8" class="empty-state">No reports submitted yet. Be the first to report a road defect!</td></tr>';
+                return;
+            }
+
+            // Calculate severity scores
+            reports.forEach((report) => {
+                report.severityScore = calculateSeverityScore(report);
+            });
+
+            tbody.innerHTML = reports
+                .map(
+                    (report) => `
+                        <tr class="animate-in">
+                            <td><strong>${report.roadName}</strong></td>
+                            <td><span class="road-${report.roadType.replace(' ', '-')}">${report.roadType}</span></td>
+                            <td>${report.defects.join(", ")}</td>
+                            <td><span class="severity-${report.severity}">${report.severity.toUpperCase()}</span></td>
+                            <td>${report.responseTime} days</td>
+                            <td><strong>${report.reportCount}</strong></td>
+                            <td><strong>${report.severityScore}</strong></td>
+                            <td><button class="btn-danger" onclick="removeReport(${report.id})">Remove</button></td>
+                        </tr>
+                    `
+                )
+                .join("");
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById("totalReports").textContent = reports.length;
+            document.getElementById("criticalIssues").textContent = reports.filter(
+                (r) => r.severity === "critical"
+            ).length;
+
+            const avgResponse =
+                reports.length > 0
+                    ? Math.round(
+                          reports.reduce((sum, r) => sum + r.responseTime, 0) /
+                          reports.length
+                      )
+                    : 0;
+            document.getElementById("avgResponseTime").textContent = avgResponse;
+        }
+
+        // Knapsack Algorithm Implementation
+        function knapsackOptimization(reports, timeBudget) {
+            const n = reports.length;
+            if (n === 0)
+                return { selectedReports: [], totalValue: 0, totalTime: 0 };
+
+            const dp = Array(n + 1)
+                .fill(null)
+                .map(() => Array(timeBudget + 1).fill(0));
+
+            for (let i = 1; i <= n; i++) {
+                for (let w = 0; w <= timeBudget; w++) {
+                    const report = reports[i - 1];
+                    if (report.responseTime <= w) {
+                        dp[i][w] = Math.max(
+                            dp[i - 1][w],
+                            dp[i - 1][w - report.responseTime] + report.severityScore
+                        );
+                    } else {
+                        dp[i][w] = dp[i - 1][w];
+                    }
+                }
+            }
+
+            // Backtrack to find selected reports
+            const selectedReports = [];
+            let w = timeBudget;
+            for (let i = n; i > 0 && dp[i][w] > 0; i--) {
+                if (dp[i][w] !== dp[i - 1][w]) {
+                    selectedReports.unshift(reports[i - 1]);
+                    w -= reports[i - 1].responseTime;
+                }
+            }
+
+            return {
+                selectedReports,
+                totalValue: dp[n][timeBudget],
+                totalTime: selectedReports.reduce(
+                    (sum, r) => sum + r.responseTime,
+                    0
+                ),
+            };
+        }
+
+        // QuickSort Implementation
+        function quickSort(arr) {
+            if (arr.length <= 1) {
+                return arr;
+            }
+
+            const pivot = arr[0];
+            const left = [];
+            const right = [];
+
+            for (let i = 1; i < arr.length; i++) {
+                if (arr[i].severityScore > pivot.severityScore) {
+                    left.push(arr[i]);
+                } else {
+                    right.push(arr[i]);
+                }
+            }
+
+            return [...quickSort(left), pivot, ...quickSort(right)];
+        }
+
+        // Run optimization
+        function runOptimization() {
+            const timeBudget =
+                parseInt(document.getElementById("maintenanceBudget").value) || 180;
+
+            // Knapsack optimization
+            const knapsackResult = knapsackOptimization(reports, timeBudget);
+            document.getElementById("knapsackResults").innerHTML = `
+                    <p><strong>Total Severity Score:</strong> ${knapsackResult.totalValue}</p>
+                    <p><strong>Time Required:</strong> ${knapsackResult.totalTime} days</p>
+                    <p><strong>Selected Roads:</strong></p>
+                    ${knapsackResult.selectedReports
+                        .map(
+                            (r, i) => `
+                            <div class="road-item">
+                                <strong>${i + 1}. ${r.roadName}</strong>
+                                <div>Severity Score: ${r.severityScore} | Time: ${r.responseTime} days</div>
+                                <div>Defects: ${r.defects.join(", ")}</div>
+                            </div>
+                        `
+                        )
+                        .join("")}
+                `;
+
+            // QuickSort optimization
+            const sortedReports = quickSort([...knapsackResult.selectedReports]);
+            document.getElementById("quicksortResults").innerHTML = `
+                    <p><strong>Prioritized Maintenance Order:</strong></p>
+                    ${sortedReports
+                        .map(
+                            (r, i) => `
+                            <div class="road-item">
+                                <strong>${i + 1}. ${r.roadName}</strong>
+                                <div>Severity Score: ${r.severityScore} | Severity: ${r.severity}</div>
+                                <div>Time: ${r.responseTime} days</div>
+                            </div>
+                        `
+                        )
+                        .join("")}
+                `;
+
+            // Dijkstra route planning (simulated)
+            document.getElementById("dijkstraResults").innerHTML = `
+                    <div class="route-visualization">
+                        <h4>Optimal Maintenance Route</h4>
+                        <div class="route-step">
+                            <span>🚗 Start</span>
+                            <span class="route-arrow">➡️</span>
+                            <span>${sortedReports[0]?.roadName || "N/A"}</span>
+                        </div>
+                        ${sortedReports
+                            .slice(1)
+                            .map(
+                                (r) => `
+                                <div class="route-step">
+                                    <span class="route-arrow">➡️</span>
+                                    <span>${r.roadName}</span>
+                                </div>
+                            `
+                            )
+                            .join("")}
+                        <div class="route-step">
+                            <span class="route-arrow">➡️</span>
+                            <span>🏁 End</span>
+                        </div>
+                    </div>
+                    <p><strong>Total Distance:</strong> ${(Math.random() * 100 + 50).toFixed(1)} km</p>
+                    <p><strong>Estimated Travel Time:</strong> ${(Math.random() * 5 + 2).toFixed(1)} hours</p>
+                `;
+
+            // Show results
+            document.getElementById("algorithmResults").style.display = "grid";
+
+            // Update budget utilization
+            const utilization = Math.round(
+                (knapsackResult.totalTime / timeBudget) * 100
+            );
+            document.getElementById(
+                "budgetUtilization"
+            ).textContent = `${utilization}%`;
+
+            // Generate maintenance schedule
+            generateMaintenanceSchedule(sortedReports);
+
+            // Update visualization
+            updateVisualization(sortedReports);
+        }
+
+        // Generate maintenance schedule
+        function generateMaintenanceSchedule(sortedReports) {
+            if (sortedReports.length === 0) return;
+
+            let scheduleHTML = '<div class="route-visualization">';
+            let currentDate = new Date();
+
+            sortedReports.forEach((report, index) => {
+                const startDate = new Date(currentDate);
+                const endDate = new Date(currentDate);
+                endDate.setDate(endDate.getDate() + report.responseTime);
+
+                scheduleHTML += `
+                            <div class="road-item">
+                                <strong>Day ${index + 1}-${index + report.responseTime}: ${report.roadName}</strong>
+                                <div>${startDate.toDateString()} to ${endDate.toDateString()}</div>
+                                <div>Severity Score: ${report.severityScore} | Severity: ${report.severity}</div>
+                                <div>Defects: ${report.defects.join(", ")}</div>
+                                <div class="score-breakdown">
+                                    <div class="score-row">Road Type Score: <span class="score-value">${roadTypeScores[report.roadType] || 0}</span></div>
+                                    <div class="score-row">Defect Score: <span class="score-value">${report.defects.reduce((sum, defect) => sum + (defectData[defect]?.severity || 0), 0)}</span></div>
+                                    <div class="score-row">Report Count: <span class="score-value">${report.reportCount}</span></div>
+                                </div>
+                            </div>
+                        `;
+
+                // Move to next date
+                currentDate.setDate(currentDate.getDate() + report.responseTime + 1);
+            });
+
+            scheduleHTML += "</div>";
+            document.getElementById("maintenanceSchedule").innerHTML = scheduleHTML;
+        }
+
+        // Initialize visualization
+        function initVisualization() {
+            const slider = document.getElementById("day-slider");
+            slider.addEventListener("input", () => {
+                updateVisualizationDisplay(slider.value);
+            });
+            updateVisualizationDisplay(slider.value);
+        }
+
+        // Update visualization display
+        function updateVisualizationDisplay(day) {
+            document.getElementById("current-day").textContent = day;
+            document.getElementById("timeline-day").textContent = day;
+
+            // Update road stats based on day
+            let available = 18;
+            let maintenance = 5;
+            let blocked = 7;
+
+            if (day < 5) {
+                available = 12;
+                maintenance = 3;
+                blocked = 15;
+            } else if (day < 10) {
+                available = 15;
+                maintenance = 4;
+                blocked = 11;
+            } else if (day < 15) {
+                available = 17;
+                maintenance = 5;
+                blocked = 8;
+            } else if (day < 20) {
+                available = 18;
+                maintenance = 5;
+                blocked = 7;
+            } else if (day < 25) {
+                available = 20;
+                maintenance = 4;
+                blocked = 6;
+            } else {
+                available = 23;
+                maintenance = 2;
+                blocked = 5;
+            }
+
+            document.getElementById("available-roads").textContent = available;
+            document.getElementById("maintenance-roads").textContent = maintenance;
+            document.getElementById("blocked-roads").textContent = blocked;
+
+            // Update the visualization
+            const map = document.getElementById("network-map");
+            map.innerHTML =
+                '<div style="height:100%;background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;">' +
+                `<div class="road" style="position:absolute;top:20%;left:10%;width:80%;height:8px;background:${
+                    day >= 7 ? "#2ed573" : day >= 1 ? "#ffa502" : "#ff4757"
+                };border-radius:4px;"></div>` +
+                `<div class="road" style="position:absolute;top:40%;left:10%;width:80%;height:8px;background:${
+                    day >= 10 ? "#2ed573" : day >= 3 ? "#ffa502" : "#ff4757"
+                };border-radius:4px;"></div>` +
+                `<div class="road" style="position:absolute;top:60%;left:10%;width:80%;height:8px;background:${
+                    day >= 25 ? "#2ed573" : day >= 18 ? "#ffa502" : "#ff4757"
+                };border-radius:4px;"></div>` +
+                '<div class="node" style="position:absolute;top:20%;left:10%;width:20px;height:20px;background:#1e3c72;border-radius:50%;border:3px solid white;"></div>' +
+                '<div class="node" style="position:absolute;top:20%;left:90%;width:20px;height:20px;background:#1e3c72;border-radius:50%;border:3px solid white;"></div>' +
+                '<div class="node" style="position:absolute;top:40%;left:30%;width:20px;height:20px;background:#1e3c72;border-radius:50%;border:3px solid white;"></div>' +
+                '<div class="node" style="position:absolute;top:40%;left:70%;width:20px;height:20px;background:#1e3c72;border-radius:50%;border:3px solid white;"></div>' +
+                '<div class="node" style="position:absolute;top:60%;left:50%;width:20px;height:20px;background:#1e3c72;border-radius:50%;border:3px solid white;"></div>' +
+                `<div class="road" style="position:absolute;top:50%;left:10%;width:8px;height:40%;background:${
+                    day >= 12 ? "#2ed573" : day >= 5 ? "#ffa502" : "#ff4757"
+                };border-radius:4px;"></div>` +
+                `<div class="road" style="position:absolute;top:40%;left:50%;width:8px;height:20%;background:${
+                    day >= 20 ? "#2ed573" : day >= 12 ? "#ffa502" : "#ff4757"
+                };border-radius:4px;"></div>` +
+                `<div style="position:absolute;top:10px;left:10px;background:white;padding:10px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0.1);">Day ${day} of 30</div>` +
+                "</div>";
+        }
+
+        // Update visualization with optimized schedule
+        function updateVisualization(sortedReports) {
+            if (sortedReports.length === 0) return;
+
+            // Clear existing list
+            const roadList = document.getElementById("visualization-road-list");
+            roadList.innerHTML = "";
+
+            // Add new items based on optimized schedule
+            sortedReports.forEach((report, index) => {
+                const statuses = [
+                    "status-pending",
+                    "status-active",
+                    "status-completed",
+                ];
+                const statusClasses = [
+                    "status-planned",
+                    "status-in-progress",
+                    "status-complete",
+                ];
+                const statusTexts = ["Planned", "In Progress", "Completed"];
+
+                const statusIndex = Math.min(index, 2);
+                const startDay = index * 5 + 1;
+                const endDay = startDay + report.responseTime - 1;
+
+                const roadItem = document.createElement("div");
+                roadItem.className = "road-item-vis";
+                roadItem.innerHTML = `
+                    <div>
+                        <span class="road-status ${statuses[statusIndex]}"></span>
+                        <span class="road-name">${report.roadName}</span>
+                    </div>
+                    <div class="road-days">Days ${startDay}-${endDay}</div>
+                `;
+                roadList.appendChild(roadItem);
+            });
+        }
+    </script>
+</body>
+</html>
