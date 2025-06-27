@@ -23,12 +23,11 @@
         <div class="floating-road"><i class='bx bx-traffic-barrier'></i></div>
         <div class="floating-sign"><i class='bx bx-alert-triangle'></i></div>
         <div class="floating-sign"><i class='bx bx-siren'></i></div>
-    </div>    
-    <header class="header-sticky"> 
+    </div>    <header class="header-sticky"> 
         <a href="landingPage.html" class="logo">
             <img src="../assets/logowDAA.png" alt="Company Logo">
             DaangMatino 
-        </a>        <ul class="navbar">
+        </a><ul class="navbar">
             <li><a href="#home" class="active">Home</a></li>
             <li><a href="#features">Features</a></li>
             <li><a href="#about">About Us</a></li>
@@ -46,69 +45,187 @@
         </div>
     </header>
 
-
-    <section class="hero" id="home">
-        <div class="hero-content" data-aos="fade-up">
-            <h1>Road Network Maintenance<br>Planning System</h1>
-            <p>Help make our roads safer by reporting potholes, damaged signs, and other road hazards in real-time.</p>
-            <div class="hero-buttons">
-                <a href="test.html"><button class="btn-primary"><i class='bx bx-siren-alt'></i> Report an Issue</button></a>
-                <a href="#features"><button class="btn-secondary"><i class='bx bx-search-alt'></i> Explore Features</button></a>
+<section class="hero" id="home">
+        <div class="hero-container">
+            <div class="hero-text" data-aos="fade-right">
+                <h1>Report <span class="highlight">Ways</span>,<br>Drive <span class="highlight">Wais</span></h1>
+                <p>Report road hazards in real time, stay informed with updates from others, and find the fastest, safest route from your location to your destination—all in one platform.</p>
+                <div class="hero-actions">
+                    <a href="test.html" class="action-link">
+                        <span>Report here</span>
+                        <i class='bx bx-chevron-right'></i>
+                    </a>
+                    <a href="#" class="action-link">
+                        <span>Be updated</span>
+                        <i class='bx bx-chevron-right'></i>
+                    </a>
+                    <a href="maps.html" class="action-link">
+                        <span>Find your shortest route</span>
+                        <i class='bx bx-chevron-right'></i>
+                    </a>
+                </div>
             </div>
+
+            <div class="hero-visual" data-aos="fade-left">
+                <div class="map-container">
+                    <div class="map-bg-circle"></div>
+                    <!-- Updated image path to match typical asset location -->
+                    <img src="../assets/mapsPUP.png" alt="Map of road network" class="map-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+        <section class="how-it-works" id="features"> 
+        <div class="how-it-works-card" data-aos="fade-up">
+            <h2>HOW IT WORKS</h2>
+            <div class="works-list">
+                <div class="work-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="work-icon-container red">
+                        <img src="../assets/icon-knapsack.png" alt="Knapsack Icon" class="work-icon-img">
+                    </div>  
+                    <div class="work-text-content">
+                        <h3>Knapsack Algorithm</h3>
+                        <p>Used to select a subset of roads that can be repaired within a limited time, based on severity and repair duration.</p>
+                    </div>
+                </div>
+                <div class="work-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="work-icon-container orange">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="4" r="2.5"/><circle cx="5" cy="10" r="2.5"/><circle cx="19" cy="10" r="2.5"/><circle cx="12" cy="19" r="2.5"/><circle cx="5" cy="17" r="2.5"/><path d="M12 6.5v10M6.5 11l4-2.5m1 2.5l4-2.5M6.5 16l4 1.5m1-1.5l4 1.5"/>
+                        </svg>
+                    </div>
+                    <div class="work-text-content">
+                        <h3>Dijkstra's Algorithm</h3>
+                        <p>Identifies optimal alternative routes for commuters when main roads are under maintenance.</p>
+                    </div>
+                </div>
+                <div class="work-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="work-icon-container green">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="3" y="16" width="3" height="4"/>
+                            <rect x="7" y="13" width="3" height="7"/>
+                            <rect x="11" y="10" width="3" height="10"/>
+                            <rect x="15" y="6" width="3" height="14"/>
+                            <rect x="19" y="2" width="3" height="18"/>
+                        </svg>
+                    </div>
+                    <div class="work-text-content">
+                        <h3>Quick Sort</h3>
+                        <p>Sorts the selected roads by severity and other factors to prioritize the repair order.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-us" id="about">
+        <div class="about-us-container">
+            <h2 data-aos="fade-up">ABOUT US</h2>
+            <p class="about-description" data-aos="fade-up" data-aos-delay="100">This website is developed by students from the Polytechnic University of the Philippines (PUP), under the Bachelor of Science in Computer Science program, as part of their final requirement for their Course Design and Analysis of Algorithms. The team is composed of dedicated individuals committed to delivering a functional and purposeful digital solution that addresses the need for an efficient road network maintenance planning system. With their shared aspiration of change and quality output, the group has demonstrated their teamwork, technical expertise, and understanding of real-world applications through this project. With this collective effort, the website DaangMatino was created as the final product.</p>
+
+            <section class="team-section">
+            <div class="team-background-overlay">
+                <div class="page-content-wrapper">
+                    <h2>Meet Our Team</h2>
+                    <div class="team-cards-container">
+                        <div class="team-card">
+                            <div class="team-card-inner">
+                                <img src="../assets/2.png" alt="Team Member 1" class="team-member-photo">
+                                <div class="team-member-info">
+                                    <h3>Chryshella Grace P. Bautista</h3>
+                                    <p>Project Lead Developer</p>
+                                    <div class="member-divider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-card-inner">
+                                <img src="../assets/5.png" alt="Team Member 2" class="team-member-photo">
+                                <div class="team-member-info">
+                                    <h3>Melvin John Delen</h3>
+                                    <p>Backend Developer</p>
+                                    <div class="member-divider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-card-inner">
+                                <img src="../assets/3.png" alt="Team Member 3" class="team-member-photo">
+                                <div class="team-member-info">
+                                    <h3>John Richard J. Federico</h3>
+                                    <p>Frontend Developer & Backend Developer</p>
+                                    <div class="member-divider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-card-inner">
+                                <img src="../assets/6.png" alt="Team Member 4" class="team-member-photo">
+                                <div class="team-member-info">
+                                    <h3>Alliza Leira L. Lasac</h3>
+                                    <p>UI/UX Designer & Frontend Developer</p>
+                                    <div class="member-divider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-card-inner">
+                                <img src="../assets/1.png" alt="Team Member 5" class="team-member-photo">
+                                <div class="team-member-info">
+                                    <h3>Nethan Edry L. Gragas</h3>
+                                    <p>Frontend Developer & Backend Developer</p>
+                                    <div class="member-divider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-card-inner">
+                                <img src="../assets/4.png" alt="Team Member 5" class="team-member-photo">
+                                <div class="team-member-info">
+                                    <h3>Yvan Raphael T. Bombola</h3>
+                                    <p>Data Administrator & Frontend Developer</p>
+                                    <div class="member-divider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-card-inner">
+                                <img src="../assets/9.png" alt="Team Member 4" class="team-member-photo">
+                                <div class="team-member-info">
+                                    <h3>Kristina Casandra C. Nagera</h3>
+                                    <p>Documentation Specialist</p>
+                                    <div class="member-divider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-card-inner">
+                                <img src="../assets/8.png" alt="Team Member 5" class="team-member-photo">
+                                <div class="team-member-info">
+                                    <h3>Jairus Chrisnie T. Rimon</h3>
+                                    <p>Documentation Specialist</p>
+                                    <div class="member-divider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-card-inner">
+                                <img src="../assets/7.png" alt="Team Member 5" class="team-member-photo">
+                                <div class="team-member-info">
+                                    <h3>John Paul T. Tamares</h3>
+                                    <p>Frontend Developer & Documentation Specialist</p>
+                                    <div class="member-divider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
         </div>
     </section>
     
-    <section class="features" id="features">
-        <div class="features-header" data-aos="fade-up">
-            <h2>Key Features</h2>
-            <p>Explore how DaangMatino is transforming road maintenance by combining citizen participation with smart technology solutions</p>
-        </div>
-        
-        <div class="features-grid">
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
-                <span class="feature-icon"><i class='bx bx-mobile'></i></span>
-                <h3>Citizen Reporting System</h3>
-                <p>Citizens can report road damage with photos, descriptions, and track progress with updates</p>
-            </div>
-              
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
-                <span class="feature-icon"><i class='bx bx-arrow-big-up-line'></i></span>
-                <h3>Priority Queueing</h3>
-                <p>Intelligent road repair prioritization system</p>
-            </div>
-
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
-                <span class="feature-icon"><i class='bx bx-split'></i></span>
-                <h3>Alternative Route Generator</h3>
-                <p>Compute and display optimal routes for motorists affected by ongoing repairs</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="algorithm" id="about">
-        <div class="algorithm-header" data-aos="fade-up">
-            <h2>Smart Algorithms Behind the System</h2>
-            <p>Our system uses smart algorithms to improve road maintenance planning and make better use of resources</p>
-        </div>
-
-        <div class="algorithm-grid">
-            <div class="algorithm-card" data-aos="fade-up" data-aos-delay="100">
-                <h3><i class='bx bx-gear'></i>Knapsack Problem</h3>
-                <p>Used to select a subset of roads that can be repaired within a limited time, based on severity and repair duration</p>
-            </div>
-
-            <div class="algorithm-card" data-aos="fade-up" data-aos-delay="200">
-                <h3><i class='bx bx-strategy'></i>Dijkstra's Algorithm</h3>
-                <p>Identifies optimal alternative routes for commuters when main roads are under maintenance</p>
-            </div>  
-
-            <div class="algorithm-card" data-aos="fade-up" data-aos-delay="300">
-                <h3><i class='bx bx-fast-forward'></i>Quick Sort</h3>
-                <p>Sorts the selected roads by severity and other factors to prioritize the repair order</p>
-            </div>  
-        </div>
-    </section> 
-
   <footer id="contact">
         <div class="footer-container">
             <div class="footer-branding">
