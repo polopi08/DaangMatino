@@ -18,7 +18,6 @@ All pages are fully connected through consistent navigation menus:
 
 #### 🏠 **Landing Page** (`landingPage.html`)
 - **Home** - Scrolls to top of landing page
-- **Features** - Scrolls to features section
 - **Analytics** - Navigates to analytics dashboard
 - **About Us** - Scrolls to about section
 - **Contact** - Scrolls to contact section
@@ -27,7 +26,6 @@ All pages are fully connected through consistent navigation menus:
 
 #### 📊 **Analytics Page** (`analyticsPage.html`)
 - **Home** - Returns to landing page
-- **Features** - Returns to landing page features section
 - **Analytics** - Current page (highlighted)
 - **About Us** - Returns to landing page about section
 - **Contact** - Returns to landing page contact section
@@ -36,7 +34,6 @@ All pages are fully connected through consistent navigation menus:
 
 #### 📝 **Report Page** (`reportPage.html`)
 - **Home** - Returns to landing page
-- **Features** - Returns to landing page features section
 - **Analytics** - Navigates to analytics dashboard
 - **About Us** - Returns to landing page about section
 - **Contact** - Returns to landing page contact section
@@ -45,7 +42,6 @@ All pages are fully connected through consistent navigation menus:
 
 #### 🗺️ **Maps Page** (`maps.html`)
 - **Home** - Returns to landing page
-- **Features** - Returns to landing page features section
 - **Analytics** - Navigates to analytics dashboard
 - **About Us** - Returns to landing page about section
 - **Contact** - Returns to landing page contact section
