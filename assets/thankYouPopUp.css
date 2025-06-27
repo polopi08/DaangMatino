@@ -1,4 +1,4 @@
-/* Thank You Modal Styles */
+
 .modal-overlay {
     display: none;
     position: fixed;
@@ -36,7 +36,7 @@
     overflow: hidden;
 }
 
-/* Decorative background pattern */
+
 .modal-content::before {
     content: '';
     position: absolute;
@@ -206,7 +206,7 @@
     transform: translateY(-2px);
 }
 
-/* Animations */
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -241,7 +241,7 @@
     }
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     .modal-content {
         padding: 30px 20px;

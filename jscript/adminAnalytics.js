@@ -1,12 +1,12 @@
-// Admin Analytics Integration
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Wait for analytics script to load, then initialize admin analytics
+    
     setTimeout(initializeAdminAnalytics, 1000);
     
     function initializeAdminAnalytics() {
         console.log('Initializing admin analytics...');
         
-        // Map analytics elements to admin elements
+        
         const elementMapping = {
             'totalReports': 'totalReportsAdmin',
             'criticalReports': 'criticalReportsAdmin', 
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'recentActivity': 'recentActivityAdmin'
         };
         
-        // Copy data from analytics to admin elements
+        
         for (const [source, target] of Object.entries(elementMapping)) {
             const sourceEl = document.getElementById(source);
             const targetEl = document.getElementById(target);
@@ -33,18 +33,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Set up refresh button
+        
         const refreshBtn = document.getElementById('refreshBtnAdmin');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', function() {
                 refreshBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Refreshing...';
                 
-                // Refresh analytics data
+                
                 setTimeout(() => {
-                    // Trigger analytics refresh if available
+                    
                     if (typeof initializeAnalytics === 'function') {
                         initializeAnalytics().then(() => {
-                            // Copy updated data
+                            
                             initializeAdminAnalytics();
                             refreshBtn.innerHTML = '<i class="bx bx-refresh"></i> Refresh';
                         });

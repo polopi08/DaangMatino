@@ -1,6 +1,6 @@
-// Report Page Script with Supabase Integration
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Ensure DatabaseService is available
+    
     if (typeof window.DatabaseService === 'undefined') {
         console.warn('DatabaseService not available, retrying...');
         setTimeout(() => {
@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let selectedFiles = [];
 
-    // Set up modal event listeners
+    
     setupModalEventListeners();
 
-    // File upload handler
+    
     fileInput.addEventListener('change', handleFileSelection);
     
-    // Drag and drop functionality
+    
     const uploadLabel = document.querySelector('.upload-label');
     
     uploadLabel.addEventListener('dragover', (e) => {
@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleFiles(files) {
-        // Filter valid files (images and videos only)
+        
         const validFiles = files.filter(file => {
             const isValid = file.type.startsWith('image/') || file.type.startsWith('video/');
-            const isUnder10MB = file.size <= 10 * 1024 * 1024; // 10MB limit
+            const isUnder10MB = file.size <= 10 * 1024 * 1024; 
             
             if (!isValid) {
                 showNotification('Please select only image or video files.', 'error');
@@ -116,13 +116,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    // Form submission handler
+    
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         await submitReport();
     });
 
-    // Cancel button handler
+    
     cancelBtn.addEventListener('click', function() {
         if (confirm('Are you sure you want to cancel? All entered data will be lost.')) {
             window.location.href = 'landingPage.html';
@@ -130,11 +130,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function submitReport() {
-        // Show loading state
+        
         setLoadingState(true);
 
         try {
-            // Collect form data
+            
             const formData = new FormData(form);
             const reportData = {
                 reporterName: formData.get('reporter_name') || null,
@@ -146,19 +146,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 priority: formData.get('priority'),
                 locationDescription: formData.get('location_description'),
                 description: formData.get('description')
-            };            // Validate required fields
+            };            
             if (!reportData.reporterEmail || !reportData.issueType || !reportData.dateOccurred || 
                 !reportData.timeOccurred || !reportData.priority || !reportData.locationDescription || 
                 !reportData.description) {
                 throw new Error('Please fill in all required fields.');
             }
 
-            // Check if DatabaseService is available
+            
             if (typeof window.DatabaseService === 'undefined') {
                 throw new Error('System not initialized. Please refresh the page and try again.');
             }
 
-            // Create report in database
+            
             const reportResult = await DatabaseService.createReport(reportData);
             
             if (!reportResult.success) {
@@ -167,12 +167,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const report = reportResult.data;
             
-            // Check if we're in demo mode
+            
             if (reportResult.demo) {
                 showNotification('🎭 Demo Mode: Report simulated successfully! Configure Supabase for real database functionality.', 'info');
             }
             
-            // Upload attachments if any (in demo mode, this will be simulated)
+            
             if (selectedFiles.length > 0) {
                 for (const file of selectedFiles) {
                     const uploadResult = await DatabaseService.uploadAttachment(file, report.id);
@@ -182,24 +182,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log('📎 Demo: File upload simulated for', file.name);
                     }
                 }
-            }            // Create access token for tracking (simulated in demo mode)
+            }            
             const tokenResult = await DatabaseService.createReportToken(report.id);
             
             if (!tokenResult.success) {
                 console.warn('Failed to create report token:', tokenResult.error);
-                // Don't fail the entire submission for token creation failure
-                // Token is optional for tracking purposes
+                
+                
             } else {
                 console.log('✅ Report token created successfully:', tokenResult.data.access_token);
             }
             
-            // Show success modal
+            
             showSuccessModal(report.public_id || `RPT-${String(report.id).padStart(6, '0')}`);
 
         } catch (error) {
             console.error('Error submitting report:', error);
             
-            // Check if it's a configuration error
+            
             if (error.message.includes('Supabase not configured')) {
                 showNotification('⚙️ Database not configured. Please follow the setup guide in SUPABASE_SETUP.md to enable full functionality.', 'warning');
             } else {
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showNotification(message, type = 'info', duration = 5000) {
-        // Create notification element
+        
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.innerHTML = `
@@ -241,24 +241,24 @@ document.addEventListener('DOMContentLoaded', function() {
             <button class="close-notification"><i class='bx bx-x'></i></button>
         `;
 
-        // Add to page
+        
         document.body.appendChild(notification);
 
-        // Auto remove after specified duration
+        
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.remove();
             }
         }, duration);
 
-        // Close button handler
+        
         notification.querySelector('.close-notification').addEventListener('click', () => {
             notification.remove();
         });
     }
 
     function setupModalEventListeners() {
-        // Set up event listeners for modal buttons
+        
         const viewAnalyticsBtn = document.getElementById('viewAnalyticsBtn');
         const newReportBtn = document.getElementById('newReportBtn');
         
@@ -279,15 +279,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Set default date to today
+    
     document.getElementById('date-occurred').valueAsDate = new Date();
 
-    // Close modal when clicking outside
+    
     successModal.addEventListener('click', function(e) {
         if (e.target === successModal) {
             successModal.style.display = 'none';
         }
-    });    // Check if running in demo mode and notify user
+    });    
     setTimeout(() => {
         if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
             showNotification(

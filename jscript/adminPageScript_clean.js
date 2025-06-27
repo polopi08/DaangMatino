@@ -1,12 +1,12 @@
-// Admin Dashboard JavaScript with Supabase Integration
+
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Admin page DOM loaded, initializing dashboard...');
     
-    // Initialize dashboard
+    
     initializeDashboard();
     
-    // View all reports button click handler
+    
     const viewAllBtn = document.querySelector('.view-all-btn');
     if (viewAllBtn) {
         viewAllBtn.addEventListener('click', function() {
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add interaction to the pie chart
+    
     const chartSegments = document.querySelectorAll('.pie-chart circle');
     const legendItems = document.querySelectorAll('.legend-item');
     
@@ -35,12 +35,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Initialize dashboard with real data
+
 async function initializeDashboard() {
     try {
         console.log('Initializing dashboard...');
         
-        // Check for demo mode
+        
         if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
             console.log('Demo mode detected');
             showNotification(
@@ -50,15 +50,15 @@ async function initializeDashboard() {
             );
         }
 
-        // Load dashboard statistics
+        
         console.log('Loading dashboard stats...');
         await loadDashboardStats();
         
-        // Load reports table with real data
+        
         console.log('Loading reports table...');
         await loadReportsTable();
         
-        // Generate pie chart with real data
+        
         console.log('Loading pie chart...');
         await loadPieChart();
         
@@ -69,13 +69,13 @@ async function initializeDashboard() {
     }
 }
 
-// Load dashboard statistics
+
 async function loadDashboardStats() {
     try {
         const response = await DatabaseService.getAllReports();
         const reports = response.success ? response.data : [];
         
-        // Update total reports count
+        
         const totalReportsEl = document.querySelector('.report-number');
         if (totalReportsEl) {
             totalReportsEl.textContent = reports ? reports.length : 0;
@@ -87,12 +87,12 @@ async function loadDashboardStats() {
     }
 }
 
-// Load and display reports in the summary table
+
 async function loadReportsTable(limit = 10) {
     try {
         console.log('Loading reports for admin table...');
         
-        // Update current date
+        
         const currentDateEl = document.getElementById('currentDate');
         if (currentDateEl) {
             currentDateEl.textContent = new Date().toLocaleDateString();
@@ -125,7 +125,7 @@ async function loadReportsTable(limit = 10) {
         
         console.log(`Processing ${reports.length} reports for table display`);
         
-        // Sort reports by priority (1 = highest priority)
+        
         const sortedReports = reports
             .sort((a, b) => {
                 const priorityA = getPriorityValue(a.priority);
@@ -170,7 +170,7 @@ async function loadReportsTable(limit = 10) {
         tableBody.innerHTML = tableRows;
         console.log('Table updated successfully');
         
-        // Add click handlers to new rows
+        
         const newRows = tableBody.querySelectorAll('tr');
         newRows.forEach(row => {
             row.addEventListener('click', function() {
@@ -195,14 +195,14 @@ async function loadReportsTable(limit = 10) {
     }
 }
 
-// Load pie chart with real data
+
 async function loadPieChart() {
     try {
         const response = await DatabaseService.getAllReports();
         const reports = response.success ? response.data : [];
         
         if (!reports || reports.length === 0) {
-            // Show empty chart
+            
             const chartContainer = document.getElementById('pieChartContainer');
             if (chartContainer) {
                 chartContainer.innerHTML = '<div class="empty-chart">No data available</div>';
@@ -210,7 +210,7 @@ async function loadPieChart() {
             return;
         }
         
-        // Group reports by priority
+        
         const priorityGroups = {};
         reports.forEach(report => {
             const priority = getPriorityValue(report.priority);
@@ -223,7 +223,7 @@ async function loadPieChart() {
             color: getPriorityColor(priority)
         }));
         
-        // Generate pie chart
+        
         generatePieChart(chartData);
         
     } catch (error) {
@@ -231,7 +231,7 @@ async function loadPieChart() {
     }
 }
 
-// Generate SVG pie chart
+
 function generatePieChart(data) {
     const chartContainer = document.getElementById('pieChartContainer');
     const legendContainer = document.getElementById('chartLegend');
@@ -247,8 +247,8 @@ function generatePieChart(data) {
     const total = data.reduce((sum, item) => sum + item.value, 0);
     let currentAngle = 0;
     
-    // Create SVG
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    
+    const svg = document.createElementNS('http:
     svg.setAttribute('width', '200');
     svg.setAttribute('height', '200');
     svg.setAttribute('viewBox', '0 0 200 200');
@@ -257,7 +257,7 @@ function generatePieChart(data) {
     const centerY = 100;
     const radius = 80;
     
-    // Generate pie slices
+    
     data.forEach((item, index) => {
         const percentage = (item.value / total) * 100;
         const angle = (item.value / total) * 360;
@@ -272,7 +272,7 @@ function generatePieChart(data) {
             path.setAttribute('data-value', item.value);
             path.setAttribute('data-percentage', percentage.toFixed(1));
             
-            // Add hover effect
+            
             path.addEventListener('mouseenter', function() {
                 this.style.transform = 'scale(1.05)';
                 this.style.transformOrigin = '100px 100px';
@@ -287,11 +287,11 @@ function generatePieChart(data) {
         }
     });
     
-    // Clear and add new chart
+    
     chartContainer.innerHTML = '';
     chartContainer.appendChild(svg);
     
-    // Generate legend
+    
     const legendHTML = data.map(item => {
         const percentage = ((item.value / total) * 100).toFixed(1);
         return `
@@ -306,7 +306,7 @@ function generatePieChart(data) {
     legendContainer.innerHTML = legendHTML;
 }
 
-// Create pie slice path
+
 function createPieSlice(centerX, centerY, radius, startAngle, endAngle) {
     const startAngleRad = (startAngle - 90) * Math.PI / 180;
     const endAngleRad = (endAngle - 90) * Math.PI / 180;
@@ -325,13 +325,13 @@ function createPieSlice(centerX, centerY, radius, startAngle, endAngle) {
         "Z"
     ].join(" ");
     
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const path = document.createElementNS('http:
     path.setAttribute('d', pathData);
     
     return path;
 }
 
-// Helper function to convert priority string to number
+
 function getPriorityValue(priority) {
     if (typeof priority === 'number') return priority;
     
@@ -351,38 +351,38 @@ function getPriorityValue(priority) {
     }
 }
 
-// Get color for priority level
+
 function getPriorityColor(priority) {
     const colors = {
-        '1': '#dc3545', // Red for highest priority
-        '2': '#fd7e14', // Orange
-        '3': '#ffc107', // Yellow
-        '4': '#28a745', // Green
-        '5': '#6c757d'  // Gray for lowest priority
+        '1': '#dc3545', 
+        '2': '#fd7e14', 
+        '3': '#ffc107', 
+        '4': '#28a745', 
+        '5': '#6c757d'  
     };
     return colors[priority] || '#6c757d';
 }
 
-// Helper function to determine severity based on report data
+
 function determineSeverity(report) {
     const priority = getPriorityValue(report.priority);
     const damageType = (report.damage_type || report.issue_type || '').toLowerCase();
     
-    // High priority or dangerous damage types
+    
     if (priority <= 2 || damageType.includes('manhole') || damageType.includes('critical') || damageType.includes('dangerous') || damageType.includes('traffic light')) {
         return 'High';
     }
-    // Medium priority
+    
     else if (priority <= 3 || damageType.includes('crack') || damageType.includes('medium') || damageType.includes('damaged road')) {
         return 'Medium';
     }
-    // Low priority
+    
     else {
         return 'Low';
     }
 }
 
-// Helper function to get severity description
+
 function getSeverityDescription(severity) {
     switch (severity.toLowerCase()) {
         case 'high':
@@ -396,7 +396,7 @@ function getSeverityDescription(severity) {
     }
 }
 
-// Helper function to get severity icon
+
 function getSeverityIcon(severity) {
     switch (severity.toLowerCase()) {
         case 'high':
@@ -410,18 +410,18 @@ function getSeverityIcon(severity) {
     }
 }
 
-// Load all reports (for the "View All Reports" button)
+
 function loadAllReports() {
-    // For now, just load more reports in the table
-    loadReportsTable(50); // Load up to 50 reports
+    
+    loadReportsTable(50); 
     console.log('Loading all reports...');
 }
 
-// Show notification
+
 function showNotification(message, type = 'info', duration = 5000) {
     console.log(`${type.toUpperCase()}: ${message}`);
     
-    // Create notification element
+    
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -429,10 +429,10 @@ function showNotification(message, type = 'info', duration = 5000) {
         <span>${message}</span>
     `;
     
-    // Add to page
+    
     document.body.appendChild(notification);
     
-    // Remove after duration
+    
     setTimeout(() => {
         if (notification.parentNode) {
             notification.parentNode.removeChild(notification);
@@ -440,7 +440,7 @@ function showNotification(message, type = 'info', duration = 5000) {
     }, duration);
 }
 
-// Get notification icon
+
 function getNotificationIcon(type) {
     switch (type) {
         case 'success': return 'bx-check-circle';

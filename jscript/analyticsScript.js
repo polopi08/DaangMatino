@@ -1,6 +1,6 @@
-// Analytics Page JavaScript
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Navigation functionality - Same as landing page
+    
     const hamburger = document.getElementById('hamburger');
     const navbar = document.querySelector('.navbar');
 
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
             navbar.classList.toggle('active');
         });
 
-        // Close menu when clicking on a link
+        
         const navLinks = document.querySelectorAll('.navbar a');
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
@@ -20,10 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initialize analytics dashboard
+    
     initializeAnalytics();
 
-    // Refresh button functionality
+    
     const refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', function() {
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function initializeAnalytics() {
         try {
-            // Load all analytics data
+            
             await Promise.all([
                 loadStatistics(),
                 loadMostReportedRoads(),
@@ -61,18 +61,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statsResult.success) {
                 const stats = statsResult.data;
                 
-                // Update statistics cards
+                
                 document.getElementById('totalReports').textContent = stats.total || 0;
                 document.getElementById('criticalReports').textContent = stats.byPriority?.Critical || 0;
                 document.getElementById('recentReports').textContent = stats.recent || 0;
                 
-                // Calculate affected areas (approximate based on unique locations)
-                const affectedCount = Math.min(stats.total, Math.ceil(stats.total * 0.7)); // Estimate
+                
+                const affectedCount = Math.min(stats.total, Math.ceil(stats.total * 0.7)); 
                 document.getElementById('affectedAreas').textContent = affectedCount;
                 
                 console.log('📊 Statistics loaded:', stats);
             } else {
-                // Demo mode - show sample stats
+                
                 document.getElementById('totalReports').textContent = '47';
                 document.getElementById('criticalReports').textContent = '8';
                 document.getElementById('recentReports').textContent = '12';
@@ -89,14 +89,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('mostReportedList');
             
             if (reportsResult.success && reportsResult.data.length > 0) {
-                // Group reports by location
+                
                 const locationCounts = {};
                 reportsResult.data.forEach(report => {
                     const location = report.location_description || 'Unknown Location';
                     locationCounts[location] = (locationCounts[location] || 0) + 1;
                 });
 
-                // Sort by count and get top 5
+                
                 const sortedLocations = Object.entries(locationCounts)
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 5);
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     createLeaderboardItem(index + 1, item[0], `${item[1]} reports`, item[1])
                 ).join('');
             } else {
-                // Demo data
+                
                 container.innerHTML = getDemoMostReported();
             }
         } catch (error) {
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('mostUrgentList');
             
             if (reportsResult.success && reportsResult.data.length > 0) {
-                // Filter for critical and high priority reports
+                
                 const urgentReports = reportsResult.data
                     .filter(report => ['Critical', 'High'].includes(report.priority))
                     .sort((a, b) => {
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     createUrgentItem(index + 1, report.location_description, report.issue_type, report.priority)
                 ).join('');
             } else {
-                // Demo data
+                
                 container.innerHTML = getDemoMostUrgent();
             }
         } catch (error) {
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     createLeaderboardItem(index + 1, item[0], `${item[1]} reports`, item[1])
                 ).join('');
             } else {
-                // Demo data
+                
                 container.innerHTML = getDemoIssueTypes();
             }
         } catch (error) {
@@ -171,10 +171,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('affectedAreasList');
             
             if (reportsResult.success && reportsResult.data.length > 0) {
-                // Extract area information from location descriptions
+                
                 const areaCounts = {};
                 reportsResult.data.forEach(report => {
-                    // Simple area extraction (you can make this more sophisticated)
+                    
                     const location = report.location_description || '';
                     const area = extractAreaFromLocation(location);
                     areaCounts[area] = (areaCounts[area] || 0) + 1;
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     createLeaderboardItem(index + 1, item[0], `${item[1]} reports`, item[1])
                 ).join('');
             } else {
-                // Demo data
+                
                 container.innerHTML = getDemoAffectedAreas();
             }
         } catch (error) {
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     createActivityItem(report)
                 ).join('');
             } else {
-                // Demo data
+                
                 container.innerHTML = getDemoRecentActivity();
             }
         } catch (error) {
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Helper functions
+    
     function createLeaderboardItem(rank, title, subtitle, count) {
         const rankClass = rank <= 3 ? `rank-${rank}` : '';
         return `
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function extractAreaFromLocation(location) {
-        // Simple area extraction - you can make this more sophisticated
+        
         const words = location.split(' ');
         for (let word of words) {
             if (word.includes('St') || word.includes('Ave') || word.includes('Rd') || word.includes('Blvd')) {
@@ -309,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${Math.floor(diffInSeconds / 86400)}d ago`;
     }
 
-    // Demo data functions
+    
     function getDemoMostReported() {
         return `
             <div class="leaderboard-item">

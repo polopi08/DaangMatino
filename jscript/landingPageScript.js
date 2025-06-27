@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-        // Initialize AOS animations
+        
         AOS.init({
             duration: 800,
             easing: 'ease-out-cubic',
@@ -7,19 +7,19 @@ document.addEventListener("DOMContentLoaded", function () {
             offset: 100
         });
 
-        // Navigation functionality
+        
         const navLinks = document.querySelectorAll('.navbar a');
         const sections = document.querySelectorAll('section[id], footer[id]');
         const hamburger = document.getElementById('hamburger');
         const navbar = document.querySelector('.navbar');
 
-        // Hamburger menu toggle
+        
         hamburger.addEventListener('click', function() {
             hamburger.classList.toggle('active');
             navbar.classList.toggle('active');
         });
 
-        // Close mobile menu when clicking on a link
+        
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
                 hamburger.classList.remove('active');
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        // Update active navigation link based on scroll position
+        
         function updateActiveLink() {
             let currentSection = '';
             const scrollPosition = window.scrollY + 150; 
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            // Special case for footer
+            
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
                 currentSection = 'contact';
             }
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // Smooth scrolling for navigation links
+        
         navLinks.forEach(link => {
             link.addEventListener('click', function (e) {
                 const targetId = this.getAttribute('href').substring(1);
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        // Back to Top Button functionality
+        
         const backToTopButton = document.getElementById('backToTop');
         
         function toggleBackToTopButton() {
@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        // Optimized scroll handler
+        
         let ticking = false;
         function onScroll() {
             if (!ticking) {
@@ -112,18 +112,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         window.addEventListener('scroll', onScroll);
         
-        // Initialize on page load
+        
         updateActiveLink();
         toggleBackToTopButton();
 
-        // Database functionality demo (you can expand this)
+        
         window.addEventListener('load', async function() {
             try {
-                // Example: Load some statistics for the landing page
+                
                 const stats = await DatabaseService.getReportStats();
                 if (stats.success) {
                     console.log('Report statistics loaded:', stats.data);
-                    // You could update the UI with real statistics here
+                    
                 }
             } catch (error) {
                 console.log('Database not configured yet:', error.message);

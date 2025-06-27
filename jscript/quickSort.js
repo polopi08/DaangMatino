@@ -1,4 +1,4 @@
-// Quick Sort draft onliii 
+
 function quickSort(array, low = 0, high = array.length - 1, compareFunction, steps = []) {
 
     if (low < high) {

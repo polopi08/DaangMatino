@@ -1,19 +1,19 @@
-// Admin Dashboard JavaScript with Supabase Integration
+
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dashboard
+    
     initializeDashboard();
     
-    // Add interaction to the table rows
+    
     const tableRows = document.querySelectorAll('.reports-table tbody tr');
     tableRows.forEach(row => {
         row.addEventListener('click', function() {
-            // In a real implementation, this would show detail view
+            
             console.log('Row clicked:', this.querySelector('td:nth-child(2)').textContent);
         });
     });
     
-    // View all reports button click handler
+    
     const viewAllBtn = document.querySelector('.view-all-btn');
     if (viewAllBtn) {
         viewAllBtn.addEventListener('click', function() {
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Refresh analytics button click handler
+    
     const refreshBtnAdmin = document.getElementById('refreshBtnAdmin');
     if (refreshBtnAdmin) {
         refreshBtnAdmin.addEventListener('click', function() {
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add interaction to the pie chart
+    
     const chartSegments = document.querySelectorAll('.pie-chart circle');
     const legendItems = document.querySelectorAll('.legend-item');
     
@@ -51,10 +51,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 legendItems[index].style.fontWeight = 'normal';
             }
         });
-    });    // Initialize dashboard with real data
+    });    
     async function initializeDashboard() {
         try {
-            // Check for demo mode
+            
             if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
                 showNotification(
                     'Demo Mode: Database not configured. Showing sample data. Check console for setup instructions.', 
@@ -63,13 +63,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
 
-            // Load dashboard statistics
+            
             await loadDashboardStats();
             
-            // Load recent reports
+            
             await loadRecentReports();
 
-            // Load analytics data
+            
             await loadAnalyticsData();
             
             console.log('Dashboard initialized with real data');
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadAnalyticsData() {
         try {
-            // Load all analytics components
+            
             await Promise.all([
                 loadAnalyticsStats(),
                 loadMostReportedRoads(),
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statsResult.success) {
                 const stats = statsResult.data;
                 
-                // Update analytics statistics
+                
                 updateElement('totalReportsAdmin', stats.total || 0);
                 updateElement('criticalReportsAdmin', stats.byPriority?.critical || 0);
                 updateElement('affectedAreasAdmin', Object.keys(stats.byIssueType || {}).length);
@@ -123,13 +123,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reports = reportsResult.data;
                 const roadCounts = {};
                 
-                // Count reports by road/location
+                
                 reports.forEach(report => {
                     const location = report.location_description || 'Unknown Location';
                     roadCounts[location] = (roadCounts[location] || 0) + 1;
                 });
                 
-                // Sort and get top 5
+                
                 const sortedRoads = Object.entries(roadCounts)
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 5);
@@ -185,10 +185,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (reportsResult.success) {
                 const areaCounts = {};
                 
-                // Extract area/municipality from location descriptions
+                
                 reportsResult.data.forEach(report => {
                     const location = report.location_description || 'Unknown Area';
-                    // Simple area extraction (could be improved with better parsing)
+                    
                     const area = location.split(',')[0] || location.substring(0, 30);
                     areaCounts[area] = (areaCounts[area] || 0) + 1;
                 });
@@ -320,10 +320,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize dashboard with real data
+    
     async function initializeDashboard() {
         try {
-            // Check for demo mode
+            
             if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
                 showNotification(
                     'Demo Mode: Database not configured. Showing sample data. Check console for setup instructions.', 
@@ -332,13 +332,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
 
-            // Load dashboard statistics
+            
             await loadDashboardStats();
             
-            // Load recent reports
+            
             await loadRecentReports();
 
-            // Load analytics data
+            
             await loadAnalyticsData();
             
             console.log('Dashboard initialized with real data');
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadAnalyticsData() {
         try {
-            // Load all analytics components
+            
             await Promise.all([
                 loadAnalyticsStats(),
                 loadMostReportedRoads(),
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statsResult.success) {
                 const stats = statsResult.data;
                 
-                // Update analytics statistics
+                
                 updateElement('totalReportsAdmin', stats.total || 0);
                 updateElement('criticalReportsAdmin', stats.byPriority?.critical || 0);
                 updateElement('affectedAreasAdmin', Object.keys(stats.byIssueType || {}).length);
@@ -392,13 +392,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reports = reportsResult.data;
                 const roadCounts = {};
                 
-                // Count reports by road/location
+                
                 reports.forEach(report => {
                     const location = report.location_description || 'Unknown Location';
                     roadCounts[location] = (roadCounts[location] || 0) + 1;
                 });
                 
-                // Sort and get top 5
+                
                 const sortedRoads = Object.entries(roadCounts)
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 5);
@@ -454,10 +454,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (reportsResult.success) {
                 const areaCounts = {};
                 
-                // Extract area/municipality from location descriptions
+                
                 reportsResult.data.forEach(report => {
                     const location = report.location_description || 'Unknown Area';
-                    // Simple area extraction (could be improved with better parsing)
+                    
                     const area = location.split(',')[0] || location.substring(0, 30);
                     areaCounts[area] = (areaCounts[area] || 0) + 1;
                 });
@@ -589,10 +589,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize dashboard with real data
+    
     async function initializeDashboard() {
         try {
-            // Check for demo mode
+            
             if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
                 showNotification(
                     'Demo Mode: Database not configured. Showing sample data. Check console for setup instructions.', 
@@ -601,13 +601,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
 
-            // Load dashboard statistics
+            
             await loadDashboardStats();
             
-            // Load recent reports
+            
             await loadRecentReports();
 
-            // Load analytics data
+            
             await loadAnalyticsData();
             
             console.log('Dashboard initialized with real data');
@@ -619,7 +619,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadAnalyticsData() {
         try {
-            // Load all analytics components
+            
             await Promise.all([
                 loadAnalyticsStats(),
                 loadMostReportedRoads(),
@@ -642,7 +642,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statsResult.success) {
                 const stats = statsResult.data;
                 
-                // Update analytics statistics
+                
                 updateElement('totalReportsAdmin', stats.total || 0);
                 updateElement('criticalReportsAdmin', stats.byPriority?.critical || 0);
                 updateElement('affectedAreasAdmin', Object.keys(stats.byIssueType || {}).length);
@@ -661,13 +661,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reports = reportsResult.data;
                 const roadCounts = {};
                 
-                // Count reports by road/location
+                
                 reports.forEach(report => {
                     const location = report.location_description || 'Unknown Location';
                     roadCounts[location] = (roadCounts[location] || 0) + 1;
                 });
                 
-                // Sort and get top 5
+                
                 const sortedRoads = Object.entries(roadCounts)
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 5);
@@ -723,10 +723,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (reportsResult.success) {
                 const areaCounts = {};
                 
-                // Extract area/municipality from location descriptions
+                
                 reportsResult.data.forEach(report => {
                     const location = report.location_description || 'Unknown Area';
-                    // Simple area extraction (could be improved with better parsing)
+                    
                     const area = location.split(',')[0] || location.substring(0, 30);
                     areaCounts[area] = (areaCounts[area] || 0) + 1;
                 });
@@ -858,10 +858,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize dashboard with real data
+    
     async function initializeDashboard() {
         try {
-            // Check for demo mode
+            
             if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
                 showNotification(
                     'Demo Mode: Database not configured. Showing sample data. Check console for setup instructions.', 
@@ -870,13 +870,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
 
-            // Load dashboard statistics
+            
             await loadDashboardStats();
             
-            // Load recent reports
+            
             await loadRecentReports();
 
-            // Load analytics data
+            
             await loadAnalyticsData();
             
             console.log('Dashboard initialized with real data');
@@ -888,7 +888,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadAnalyticsData() {
         try {
-            // Load all analytics components
+            
             await Promise.all([
                 loadAnalyticsStats(),
                 loadMostReportedRoads(),
@@ -911,7 +911,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statsResult.success) {
                 const stats = statsResult.data;
                 
-                // Update analytics statistics
+                
                 updateElement('totalReportsAdmin', stats.total || 0);
                 updateElement('criticalReportsAdmin', stats.byPriority?.critical || 0);
                 updateElement('affectedAreasAdmin', Object.keys(stats.byIssueType || {}).length);
@@ -930,13 +930,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reports = reportsResult.data;
                 const roadCounts = {};
                 
-                // Count reports by road/location
+                
                 reports.forEach(report => {
                     const location = report.location_description || 'Unknown Location';
                     roadCounts[location] = (roadCounts[location] || 0) + 1;
                 });
                 
-                // Sort and get top 5
+                
                 const sortedRoads = Object.entries(roadCounts)
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 5);
@@ -992,10 +992,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (reportsResult.success) {
                 const areaCounts = {};
                 
-                // Extract area/municipality from location descriptions
+                
                 reportsResult.data.forEach(report => {
                     const location = report.location_description || 'Unknown Area';
-                    // Simple area extraction (could be improved with better parsing)
+                    
                     const area = location.split(',')[0] || location.substring(0, 30);
                     areaCounts[area] = (areaCounts[area] || 0) + 1;
                 });
@@ -1127,10 +1127,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize dashboard with real data
+    
     async function initializeDashboard() {
         try {
-            // Check for demo mode
+            
             if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
                 showNotification(
                     'Demo Mode: Database not configured. Showing sample data. Check console for setup instructions.', 
@@ -1139,13 +1139,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
 
-            // Load dashboard statistics
+            
             await loadDashboardStats();
             
-            // Load recent reports
+            
             await loadRecentReports();
 
-            // Load analytics data
+            
             await loadAnalyticsData();
             
             console.log('Dashboard initialized with real data');
@@ -1157,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadAnalyticsData() {
         try {
-            // Load all analytics components
+            
             await Promise.all([
                 loadAnalyticsStats(),
                 loadMostReportedRoads(),
@@ -1180,7 +1180,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statsResult.success) {
                 const stats = statsResult.data;
                 
-                // Update analytics statistics
+                
                 updateElement('totalReportsAdmin', stats.total || 0);
                 updateElement('criticalReportsAdmin', stats.byPriority?.critical || 0);
                 updateElement('affectedAreasAdmin', Object.keys(stats.byIssueType || {}).length);
@@ -1199,13 +1199,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reports = reportsResult.data;
                 const roadCounts = {};
                 
-                // Count reports by road/location
+                
                 reports.forEach(report => {
                     const location = report.location_description || 'Unknown Location';
                     roadCounts[location] = (roadCounts[location] || 0) + 1;
                 });
                 
-                // Sort and get top 5
+                
                 const sortedRoads = Object.entries(roadCounts)
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 5);
@@ -1261,10 +1261,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (reportsResult.success) {
                 const areaCounts = {};
                 
-                // Extract area/municipality from location descriptions
+                
                 reportsResult.data.forEach(report => {
                     const location = report.location_description || 'Unknown Area';
-                    // Simple area extraction (could be improved with better parsing)
+                    
                     const area = location.split(',')[0] || location.substring(0, 30);
                     areaCounts[area] = (areaCounts[area] || 0) + 1;
                 });
@@ -1396,10 +1396,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize dashboard with real data
+    
     async function initializeDashboard() {
         try {
-            // Check for demo mode
+            
             if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
                 showNotification(
                     'Demo Mode: Database not configured. Showing sample data. Check console for setup instructions.', 
@@ -1408,13 +1408,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
 
-            // Load dashboard statistics
+            
             await loadDashboardStats();
             
-            // Load recent reports
+            
             await loadRecentReports();
 
-            // Load analytics data
+            
             await loadAnalyticsData();
             
             console.log('Dashboard initialized with real data');
@@ -1426,7 +1426,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadAnalyticsData() {
         try {
-            // Load all analytics components
+            
             await Promise.all([
                 loadAnalyticsStats(),
                 loadMostReportedRoads(),
@@ -1449,7 +1449,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statsResult.success) {
                 const stats = statsResult.data;
                 
-                // Update analytics statistics
+                
                 updateElement('totalReportsAdmin', stats.total || 0);
                 updateElement('criticalReportsAdmin', stats.byPriority?.critical || 0);
                 updateElement('affectedAreasAdmin', Object.keys(stats.byIssueType || {}).length);
@@ -1468,13 +1468,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reports = reportsResult.data;
                 const roadCounts = {};
                 
-                // Count reports by road/location
+                
                 reports.forEach(report => {
                     const location = report.location_description || 'Unknown Location';
                     roadCounts[location] = (roadCounts[location] || 0) + 1;
                 });
                 
-                // Sort and get top 5
+                
                 const sortedRoads = Object.entries(roadCounts)
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 5);
@@ -1530,10 +1530,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (reportsResult.success) {
                 const areaCounts = {};
                 
-                // Extract area/municipality from location descriptions
+                
                 reportsResult.data.forEach(report => {
                     const location = report.location_description || 'Unknown Area';
-                    // Simple area extraction (could be improved with better parsing)
+                    
                     const area = location.split(',')[0] || location.substring(0, 30);
                     areaCounts[area] = (areaCounts[area] || 0) + 1;
                 });
@@ -1665,10 +1665,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize dashboard with real data
+    
     async function initializeDashboard() {
         try {
-            // Check for demo mode
+            
             if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
                 showNotification(
                     'Demo Mode: Database not configured. Showing sample data. Check console for setup instructions.', 
@@ -1677,13 +1677,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
 
-            // Load dashboard statistics
+            
             await loadDashboardStats();
             
-            // Load recent reports
+            
             await loadRecentReports();
 
-            // Load analytics data
+            
             await loadAnalyticsData();
             
             console.log('Dashboard initialized with real data');
@@ -1695,7 +1695,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadAnalyticsData() {
         try {
-            // Load all analytics components
+            
             await Promise.all([
                 loadAnalyticsStats(),
                 loadMostReportedRoads(),
@@ -1718,7 +1718,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statsResult.success) {
                 const stats = statsResult.data;
                 
-                // Update analytics statistics
+                
                 updateElement('totalReportsAdmin', stats.total || 0);
                 updateElement('criticalReportsAdmin', stats.byPriority?.critical || 0);
                 updateElement('affectedAreasAdmin', Object.keys(stats.byIssueType || {}).length);
@@ -1737,13 +1737,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reports = reportsResult.data;
                 const roadCounts = {};
                 
-                // Count reports by road/location
+                
                 reports.forEach(report => {
                     const location = report.location_description || 'Unknown Location';
                     roadCounts[location] = (roadCounts[location] || 0) + 1;
                 });
                 
-                // Sort and get top 5
+                
                 const sortedRoads = Object.entries(roadCounts)
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 5);
@@ -1799,10 +1799,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (reportsResult.success) {
                 const areaCounts = {};
                 
-                // Extract area/municipality from location descriptions
+                
                 reportsResult.data.forEach(report => {
                     const location = report.location_description || 'Unknown Area';
-                    // Simple area extraction (could be improved with better parsing)
+                    
                     const area = location.split(',')[0] || location.substring(0, 30);
                     areaCounts[area] = (areaCounts[area] || 0) + 1;
                 });
@@ -1934,10 +1934,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize dashboard with real data
+    
     async function initializeDashboard() {
         try {
-            // Check for demo mode
+            
             if (typeof window.DatabaseService !== 'undefined' && !DatabaseService.isAvailable()) {
                 showNotification(
                     'Demo Mode: Database not configured. Showing sample data. Check console for setup instructions.', 
@@ -1946,13 +1946,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
 
-            // Load dashboard statistics
+            
             await loadDashboardStats();
             
-            // Load recent reports
+            
             await loadRecentReports();
 
-            // Load analytics data
+            
             await loadAnalyticsData();
             
             console.log('Dashboard initialized with real data');
@@ -1964,7 +1964,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadAnalyticsData() {
         try {
-            // Load all analytics components
+            
             await Promise.all([
                 loadAnalyticsStats(),
                 loadMostReportedRoads(),
@@ -1987,7 +1987,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statsResult.success) {
                 const stats = statsResult.data;
                 
-                // Update analytics statistics
+                
                 updateElement('totalReportsAdmin', stats.total || 0);
                 updateElement('criticalReportsAdmin', stats.byPriority?.critical || 0);
                 updateElement('affectedAreasAdmin', Object.keys(stats.byIssueType || {}).length);
@@ -2006,13 +2006,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reports = reportsResult.data;
                 const roadCounts = {};
                 
-                // Count reports by road/location
+                
                 reports.forEach(report => {
                     const location = report.location_description || 'Unknown Location';
                     roadCounts[location] = (roadCounts[location] || 0) + 1;
                 });
                 
-                // Sort and get top 5
+                
                 const sortedRoads = Object.entries(roadCounts)
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 5);
@@ -2068,10 +2068,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (reportsResult.success) {
                 const areaCounts = {};
                 
-                // Extract area/municipality from location descriptions
+                
                 reportsResult.data.forEach(report => {
                     const location = report.location_description || 'Unknown Area';
-                    // Simple area extraction (could be improved with better parsing)
+                    
                     const area = location.split(',')[0] || location.substring(0, 30);
                     areaCounts[area] = (areaCounts[area] || 0) + 1;
                 });

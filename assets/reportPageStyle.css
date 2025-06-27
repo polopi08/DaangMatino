@@ -381,7 +381,7 @@ header {
     margin-bottom: 30px;
 }
 
-/* File Preview Styles */
+
 .file-preview {
     margin-top: 15px;
     display: flex;
@@ -429,13 +429,13 @@ header {
     background: #c82333;
 }
 
-/* Upload Label Drag Over State */
+
 .upload-label.drag-over {
     border-color: #007bff;
     background-color: rgba(0, 123, 255, 0.05);
 }
 
-/* Modal Styles */
+
 .modal {
     display: none;
     position: fixed;
@@ -513,12 +513,12 @@ header {
     background: #545b62;
 }
 
-/* Loading Spinner */
+
 .loading-spinner {
     animation: spin 1s linear infinite;
 }
 
-/* Notification Styles */
+
 .notification {
     position: fixed;
     top: 20px;
@@ -582,7 +582,7 @@ header {
     background-color: #f0f0f0;
 }
 
-/* Animations */
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -603,7 +603,7 @@ header {
     to { transform: rotate(360deg); }
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     .modal-content {
         width: 95%;

@@ -1,3 +1,11 @@
+/* Enlarged style for Knapsack Algorithm icon on landing page */
+.knapsack-icon {
+    width: 64px !important;
+    height: 64px !important;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
 * {
     margin: 0;
     padding: 0;

@@ -1,9 +1,9 @@
-// Supabase Client Configuration
-// Replace these with your actual Supabase credentials
-const SUPABASE_URL = 'https://rnbmogqzheqzztkpwnif.supabase.co';
+
+
+const SUPABASE_URL = 'https:
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuYm1vZ3F6aGVxenp0a3B3bmlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2NTkzNjYsImV4cCI6MjA2NjIzNTM2Nn0.AFcODs36IuVEl2R5nWGgQGKU8ruqufUuvk_Qq-DfD14';
 
-// Check if Supabase is properly configured
+
 const isSupabaseConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && 
                             SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY' &&
                             SUPABASE_URL.includes('supabase.co') &&
@@ -11,9 +11,9 @@ const isSupabaseConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' &&
 
 let supabase = null;
 
-// Initialize Supabase client only if properly configured
+
 if (isSupabaseConfigured) {
-    // Wait for Supabase SDK to load
+    
     if (typeof window.supabase !== 'undefined') {
         try {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -24,7 +24,7 @@ if (isSupabaseConfigured) {
         }
     } else {
         console.warn('⚠️ Supabase SDK not loaded yet. Retrying...');
-        // Retry after a short delay
+        
         setTimeout(() => {
             if (typeof window.supabase !== 'undefined') {
                 try {
@@ -44,14 +44,14 @@ if (isSupabaseConfigured) {
     console.log('2. Update SUPABASE_URL and SUPABASE_ANON_KEY in jscript/supabaseClient.js');
 }
 
-// Database service functions
+
 class DatabaseService {
-    // Check if Supabase is available
+    
     static isAvailable() {
         return supabase !== null && isSupabaseConfigured;
     }
 
-    // Show configuration message
+    
     static showConfigMessage() {
         return {
             success: false,
@@ -59,7 +59,7 @@ class DatabaseService {
             demo: true        };
     }
 
-    // Generate sample data for demo mode
+    
     static generateSampleData() {
         return {
             success: true,
@@ -182,12 +182,12 @@ class DatabaseService {
         };
     }
 
-    // Reports operations
+    
     static async createReport(reportData) {
         console.log('📝 Creating report with data:', reportData);
         
         if (!this.isAvailable()) {
-            // Demo mode - simulate successful creation
+            
             console.log('📝 Demo mode: Report would be created with data:', reportData);
             return {
                 success: true,
@@ -241,7 +241,7 @@ class DatabaseService {
 
     static async getAllReports() {
         if (!this.isAvailable()) {
-            // Demo mode - return sample data
+            
             console.log('📊 Demo mode: Returning sample reports data');
             return this.generateSampleReports();
         }
@@ -298,7 +298,7 @@ class DatabaseService {
             console.error('Error fetching report by public ID:', error);
             return { success: false, error: error.message };
         }
-    }    // Report attachments operations
+    }    
     static async uploadAttachment(file, reportId) {
         console.log('📎 Uploading attachment:', file.name, 'for report:', reportId);
         console.log('File details:', {
@@ -309,14 +309,14 @@ class DatabaseService {
         });
         
         if (!this.isAvailable()) {
-            // Demo mode - simulate successful upload
+            
             console.log('📎 Demo mode: File would be uploaded:', file.name);
             return {
                 success: true,
                 data: {
                     id: Math.floor(Math.random() * 1000),
                     report_id: reportId,
-                    file_url: `demo://uploads/${file.name}`,
+                    file_url: `demo:
                     file_type: file.type.startsWith('image/') ? 'image' : 'document'
                 },
                 demo: true
@@ -330,7 +330,7 @@ class DatabaseService {
             
             console.log('🔄 Uploading to storage path:', filePath);
 
-            // Upload file to Supabase storage
+            
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('report-attachments')
                 .upload(filePath, file);
@@ -342,14 +342,14 @@ class DatabaseService {
             
             console.log('✅ File uploaded to storage:', uploadData);
 
-            // Get public URL
+            
             const { data: { publicUrl } } = supabase.storage
                 .from('report-attachments')
                 .getPublicUrl(filePath);
                 
             console.log('📎 Public URL generated:', publicUrl);
 
-            // Save attachment record to database
+            
             const fileType = file.type.startsWith('image/') ? 'image' : 
                            file.type.startsWith('video/') ? 'video' : 'document';
                            
@@ -398,10 +398,10 @@ class DatabaseService {
         }
     }
 
-    // Report tokens operations
+    
     static async createReportToken(reportId) {
         if (!this.isAvailable()) {
-            // Demo mode - simulate token creation
+            
             return {
                 success: true,
                 data: {
@@ -415,27 +415,27 @@ class DatabaseService {
             console.log('🎟️ Attempting to create token for report:', reportId, 'Token:', accessToken);
               console.log('🔄 Checking for existing token...');
             
-            // First check if a token already exists for this report
+            
             const { data: existingToken, error: checkError } = await supabase
                 .from('report_tokens')
                 .select('*')
                 .eq('report_id', reportId)
                 .single();
 
-            if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
+            if (checkError && checkError.code !== 'PGRST116') { 
                 console.error('❌ Error checking for existing token:', checkError);
-                // Continue anyway, might be a permissions issue
+                
             }
 
             if (existingToken) {
-                // Token already exists, return the existing one
+                
                 console.log('✅ Token already exists for report:', reportId, 'Token:', existingToken.access_token);
                 return { success: true, data: existingToken };
             }
 
             console.log('📝 Creating new token for report:', reportId);
 
-            // Create new token
+            
             const { data, error } = await supabase
                 .from('report_tokens')
                 .insert([{
@@ -448,14 +448,14 @@ class DatabaseService {
                 console.error('Error message:', error.message);
                 console.error('Error details:', error.details);
                 
-                // Check for specific error types
+                
                 if (error.message && error.message.includes('infinite recursion')) {
                     console.error('🔄 RLS Policy recursion detected! Check your RLS policies.');
                     throw new Error('Database policy error: infinite recursion in report_tokens table. Please check RLS policies.');
                 }
                 
-                // If it's a constraint violation, try to get the existing token
-                if (error.code === '23505') { // unique_violation
+                
+                if (error.code === '23505') { 
                     console.log('🔄 Token constraint violation, fetching existing token');
                     const { data: existingData } = await supabase
                         .from('report_tokens')
@@ -499,7 +499,7 @@ class DatabaseService {
         }
     }
 
-    // Admin operations
+    
     static async createAdmin(email, role = 'admin') {
         if (!this.isAvailable()) {
             return this.showConfigMessage();
@@ -542,15 +542,15 @@ class DatabaseService {
         }
     }
 
-    // Utility functions
+    
     static generateAccessToken() {
         return 'TKN-' + Math.random().toString(36).substr(2, 12).toUpperCase();
     }
 
-    // Statistics functions for admin dashboard
+    
     static async getReportStats() {
         if (!this.isAvailable()) {
-            // Demo mode - return sample statistics
+            
             console.log('📈 Demo mode: Returning sample statistics');
             return this.generateSampleData();
         }
@@ -588,13 +588,13 @@ class DatabaseService {
     }
 }
 
-// Ensure DatabaseService is available globally
+
 window.DatabaseService = DatabaseService;
 
-// Debug logging for service availability
+
 console.log('DatabaseService status:');
 console.log('- Available:', DatabaseService.isAvailable());
 console.log('- Sample reports:', DatabaseService.generateSampleReports());
 
-// Export for use in other files
+
 window.supabaseClient = supabase;

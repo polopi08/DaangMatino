@@ -1,4 +1,4 @@
-/* Analytics Page Styles - Aligned with Landing Page Design */
+
 * {
     margin: 0;
     padding: 0;
@@ -13,7 +13,7 @@ body {
     padding-top: 90px;
 }
 
-/* Background Animation - Same as Landing Page */
+
 body::before {
     content: '';
     position: fixed;
@@ -51,7 +51,7 @@ body::before {
     padding: 0 20px;
 }
 
-/* Navigation - Same as Landing Page */
+
 header, .header-sticky {
     position: fixed;
     top: 0;
@@ -170,7 +170,7 @@ header, .header-sticky {
     transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* Responsive Design */
+
 @media screen and (max-width: 768px) {
     .hamburger {
         display: flex;
@@ -231,7 +231,7 @@ header, .header-sticky {
     transform: rotate(45deg) translate(-5px, -6px);
 }
 
-/* Navigation Actions */
+
 .nav-actions {
     display: flex;
     align-items: center;
@@ -260,13 +260,13 @@ header, .header-sticky {
     text-decoration: none;
 }
 
-/* Main Content */
+
 .main-content {
     min-height: calc(100vh - 90px);
     padding: 40px 0;
 }
 
-/* Page Header */
+
 .page-header {
     text-align: center;
     margin-bottom: 40px;
@@ -286,7 +286,7 @@ header, .header-sticky {
     color: #555;
 }
 
-/* Statistics Overview */
+
 .stats-overview {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -329,7 +329,7 @@ header, .header-sticky {
     font-weight: 500;
 }
 
-/* Leaderboards */
+
 .leaderboards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -464,7 +464,7 @@ header, .header-sticky {
     color: #38a169;
 }
 
-/* Recent Activity */
+
 .recent-activity {
     background: linear-gradient(135deg, rgba(250, 250, 210, 0.95), rgba(255, 255, 255, 0.9));
     border-radius: 15px;
@@ -556,7 +556,7 @@ header, .header-sticky {
     text-align: right;
 }
 
-/* Loading State */
+
 .loading {
     text-align: center;
     padding: 40px;
@@ -564,7 +564,7 @@ header, .header-sticky {
     font-style: italic;
 }
 
-/* Footer */
+
 .footer {
     background: rgba(0, 0, 0, 0.9);
     color: white;
@@ -609,7 +609,7 @@ header, .header-sticky {
     color: #a0aec0;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     .hamburger {
         display: flex;
@@ -686,7 +686,7 @@ header, .header-sticky {
     }
 }
 
-/* Floating Elements - Same as Landing Page */
+
 .floating-elements {
     position: fixed;
     top: 0;

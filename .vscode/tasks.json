@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Remove comments from all files",
+			"command": "Get-ChildItem -Recurse -File | ForEach-Object { (Get-Content $_.FullName) -replace '/\\*.*?\\*/', '' -replace '
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

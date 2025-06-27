@@ -6,12 +6,12 @@ DaangMatino is a comprehensive road maintenance planning system that allows user
 ## 🌐 Navigation Structure
 
 ### Access URLs:
-- **Main Site:** http://127.0.0.1:3000 (automatically redirects to landing page)
-- **Landing Page:** http://127.0.0.1:3000/pages/landingPage.html
-- **Analytics Dashboard:** http://127.0.0.1:3000/pages/analyticsPage.html
-- **Report Issues:** http://127.0.0.1:3000/pages/reportPage.html
-- **Maps:** http://127.0.0.1:3000/pages/maps.html
-- **Admin Dashboard:** http://127.0.0.1:3000/pages/adminPage.html
+- **Main Site:** http:
+- **Landing Page:** http:
+- **Analytics Dashboard:** http:
+- **Report Issues:** http:
+- **Maps:** http:
+- **Admin Dashboard:** http:
 
 ### Page Connections:
 All pages are fully connected through consistent navigation menus:
@@ -61,7 +61,7 @@ All pages are fully connected through consistent navigation menus:
    ```
 
 2. **Access the application:**
-   - Open http://127.0.0.1:3000 in your browser
+   - Open http:
    - You'll be automatically redirected to the landing page
 
 3. **Navigate between pages:**
@@ -75,12 +75,12 @@ All pages are fully connected through consistent navigation menus:
    ```bash
    npm start
    ```
-   This will start the server at http://127.0.0.1:8080
+   This will start the server at http:
 
 2. **Access the application:**
-   - **Landing Page**: http://127.0.0.1:8080/pages/landingPage.html
-   - **Report Issues**: http://127.0.0.1:8080/pages/reportPage.html  
-   - **Admin Dashboard**: http://127.0.0.1:8080/pages/adminPage.html
+   - **Landing Page**: http:
+   - **Report Issues**: http:
+   - **Admin Dashboard**: http:
 
 ## Current Status
 
