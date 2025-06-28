@@ -71,14 +71,6 @@
                         />
                     </div>
                     <div class="input-group">
-                        <label for="severity">Severity Level</label>
-                        <select id="severity">
-                            <option value="high">High (Major disruption)</option>
-                            <option value="medium">Medium (Moderate impact)</option>
-                            <option value="low">Low (Minor issue)</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
                         <label for="responseTime">Estimated Response Time (days)</label>
                         <input
                             type="number"
@@ -88,7 +80,6 @@
                             readonly
                         />
                     </div>
-                </div>
 
                 <div class="input-group" style="grid-column: 1 / -1">
                     <label>Defect Types (Select all that apply)</label>
@@ -135,7 +126,7 @@
                     Submit Report
                 </button>
             </div>
-
+        </div>
             <div class="reports-table">
                 <h3
                     style="
@@ -153,17 +144,13 @@
                             <th>Road Name</th>
                             <th>Type</th>
                             <th>Defects</th>
-                            <th>Severity</th>
                             <th>Response Time</th>
-                            <th>Reports Count</th>
-                            <th>Severity Score</th>
                             <th>Date Created</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="reportsBody">
                         <tr>
-                            <td colspan="9" class="empty-state">
+                            <td colspan="5" class="empty-state">
                                 No reports submitted yet. Be the first to report a road
                                 defect!
                             </td>
@@ -192,6 +179,14 @@
                     <div class="stat-number" id="budgetUtilization">0%</div>
                     <div class="stat-label">Budget Utilization</div>
                 </div> -->
+            </div>
+
+            <!-- Most Reported Roads Section -->
+            <div class="most-reported-section" style="margin: 30px 0;">
+                <h3 style="margin-bottom: 20px; color: #212529;">📊 Most Reported Roads (Aggregated Severity)</h3>
+                <div id="mostReportedRoads" class="most-reported-container">
+                    <div class="loading">Loading most reported roads...</div>
+                </div>
             </div>
 
             <div style="margin: 30px 0">
@@ -232,7 +227,7 @@
                     <h3>⚡ QuickSort Prioritization</h3>
                     <p>
                         <strong>Purpose:</strong> Sort selected roads by priority
-                        considering severity, traffic, and community impact
+                        considering severity, type of road, and community impact
                     </p>
                     <div id="quicksortResults"></div>
                 </div>
@@ -245,6 +240,9 @@
                         maintenance periods
                     </p>
                     <div id="dijkstraResults"></div>
+                    <div id="distanceInfo" class="distance-container">
+                            <p>No nodes selected yet. Click on the map to add nodes.</p>
+                    </div>
                 </div>
             </div>
 
@@ -257,8 +255,8 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="../jscript/supabaseClient.js?v=8.1"></script>
-    <script src="../jscript/testPageScript.js?v=8.1"></script>
+    <script src="../jscript/supabaseClient.js?v=2.0"></script>
+    <script src="../jscript/testPageScript.js?v=9.4"></script>
 
 </body>
 </html>

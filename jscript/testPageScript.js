@@ -1,7 +1,7 @@
 // DaangMatino Test Page JavaScript
 // Map variables
 let map;
-let drawnItems = new L.FeatureGroup();
+let drawnItems;
 let currentMode = "node";
 let roadNodes = [];
 let roadPolylines = [];
@@ -18,7 +18,8 @@ const roadTypeScores = {
     "national road": 100,
     "municipal": 75,
     "barangay road": 50,
-    "bypass road": 25
+    "bypass road": 25,
+    "Unnamed Road": 25
 };
 
 // Defects mapping with response times and severity scores
@@ -41,6 +42,9 @@ const defectData = {
     "Unmaintained Guardrails": { days: 15 }
 };
 
+//container for storing distances between nodes
+let nodeDistances = [];
+
 // Load reports from database
 async function loadReportsFromDatabase() {
     console.log('🔄 Loading reports from database...');
@@ -56,7 +60,6 @@ async function loadReportsFromDatabase() {
                     roadName: report.road_name,
                     roadType: report.road_type || 'municipal',
                     defects: defectsList,
-                    severity: report.severity,
                     description: report.description,
                     latlng: report.latitude && report.longitude ? [report.latitude, report.longitude] : [14.5995, 120.9842],
                     reportCount: 1,
@@ -136,6 +139,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize map
 function initMap() {
+    // Check if Leaflet is loaded
+    if (typeof L === 'undefined') {
+        console.error('❌ Leaflet library is not loaded. Please check script loading order.');
+        return;
+    }
+    
+    // Initialize drawnItems after Leaflet is loaded
+    drawnItems = new L.FeatureGroup();
+    
     // Set initial view to Philippines
     map = L.map("map").setView([14.5995, 120.9842], 13);
 
@@ -146,6 +158,8 @@ function initMap() {
 
     // Add feature group to map
     drawnItems.addTo(map);
+    
+    console.log('✅ Map initialized successfully');
 }
 
 // Initialize the application
@@ -198,6 +212,78 @@ function populateDefectOptions() {
 function updateAnalytics() {
     // This will be called after loading reports to update the analytics tab
     updateStats();
+    loadMostReportedRoadsInTestPage();
+}
+
+// Load most reported roads in test page analytics tab
+async function loadMostReportedRoadsInTestPage() {
+    try {
+        console.log('🔄 Loading most reported roads for test page analytics...');
+        
+        const response = await DatabaseService.getMostReportedRoads(5);
+        const container = document.getElementById('mostReportedRoads');
+        
+        if (!container) {
+            console.error('mostReportedRoads element not found');
+            return;
+        }
+        
+        if (!response.success || !response.data || response.data.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <p>No road reports available yet.</p>
+                    <p>Submit some reports to see the leaderboard!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const roads = response.data;
+        console.log('📊 Loaded most reported roads:', roads);
+        
+        // Generate leaderboard HTML
+        const leaderboardHTML = roads.map((road, index) => {
+            const rankIcon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+            const roadTypeClass = road.road_type ? road.road_type.toLowerCase().replace(' ', '-') : 'unknown';
+            
+            return `
+                <div class="road-leaderboard-item" data-rank="${index + 1}">
+                    <div class="rank-indicator">
+                        <span class="rank-number">${rankIcon}</span>
+                    </div>
+                    <div class="road-info">
+                        <h4 class="road-name">${road.road_name}</h4>
+                        <span class="road-type-badge ${roadTypeClass}">${road.road_type || 'Unknown'}</span>
+                    </div>
+                    <div class="road-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">${road.report_count}</span>
+                            <span class="stat-label">Reports</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value severity-score">${road.aggregated_severity}</span>
+                            <span class="stat-label">Severity</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = leaderboardHTML;
+        console.log('✅ Most reported roads leaderboard loaded successfully in test page');
+        
+    } catch (error) {
+        console.error('❌ Error loading most reported roads:', error);
+        const container = document.getElementById('mostReportedRoads');
+        if (container) {
+            container.innerHTML = `
+                <div class="empty-state error">
+                    <p>Error loading leaderboard data.</p>
+                    <p>Please try refreshing the page.</p>
+                </div>
+            `;
+        }
+    }
 }
 
 // Generate defect checkboxes
@@ -305,9 +391,72 @@ function handleMapClick(e) {
             });
         }
 
+        if (roadNodes.length > 1) {
+            // Calculate distance from the previous node to the current node
+            const currentNodeIndex = roadNodes.length - 1;
+            const previousNodeIndex = currentNodeIndex - 1;
+            
+            if (previousNodeIndex >= 0) {
+                const distance = calculateDistance(roadNodes[previousNodeIndex], roadNodes[currentNodeIndex]);
+                const newDistance = {
+                    from: previousNodeIndex + 1, // Node numbers start at 1
+                    to: currentNodeIndex + 1,
+                    distance: distance,
+                    formatted: formatDistance(distance)
+                };
+                nodeDistances.push(newDistance);
+                
+                // Log distances to console for debugging
+                console.log('Node distances:', nodeDistances);
+                
+                // Update UI to show distances
+                updateDistanceDisplay();
+            }
+        }
+
         // Detect road type from OSM
         detectRoadType();
     }
+}
+
+//format distance
+function formatDistance(meters) {
+    if (meters < 1000) {
+        return Math.round(meters) + ' m';
+    } else {
+        return (meters / 1000).toFixed(2) + ' km';
+    }
+}
+
+//update distance display
+function updateDistanceDisplay() {
+    const distanceInfo = document.getElementById('distanceInfo');
+    if (!distanceInfo) return;
+    
+    if (nodeDistances.length === 0) {
+        distanceInfo.innerHTML = '<p>No distances calculated yet. Add more nodes to see distances.</p>';
+        return;
+    }
+    
+    let html = '<h3>Node Distances</h3><table class="distance-table"><tr><th>From</th><th>To</th><th>Distance</th></tr>';
+    
+    nodeDistances.forEach(dist => {
+        html += `<tr>
+            <td>Node ${dist.from}</td>
+            <td>Node ${dist.to}</td>
+            <td>${dist.formatted}</td>
+        </tr>`;
+    });
+    
+    html += '</table>';
+    
+    // Add total distance if we have a complete path
+    if (roadNodes.length > 1) {
+        const totalDistance = nodeDistances.reduce((sum, dist) => sum + dist.distance, 0);
+        html += `<p class="total-distance">Total path distance: ${formatDistance(totalDistance)}</p>`;
+    }
+    
+    distanceInfo.innerHTML = html;
 }
 
 // Detect road type from OSM
@@ -482,6 +631,8 @@ function clearSelection() {
     document.getElementById("roadName").value = "";
     document.getElementById("detectedRoadType").value = "";
     updateSelectionInfo("Click on the map to select nodes");
+    nodeDistances = [];
+    updateDistanceDisplay();
 
     // Clear defect checkboxes
     const checkboxes = document.querySelectorAll(
@@ -514,17 +665,31 @@ function switchTab(tabName) {
 
 // Submit report
 async function submitReport() {
-    const roadName = document.getElementById("roadName").value.trim();
-    const roadType = document.getElementById("detectedRoadType").value;
-    const severity = document.getElementById("severity").value;
-    const responseTime = parseInt(
-        document.getElementById("responseTime").value
-    );
+    // Get form elements with null safety checks
+    const roadNameElement = document.getElementById("roadName");
+    const roadTypeElement = document.getElementById("detectedRoadType");
+    const responseTimeElement = document.getElementById("responseTime");
+
+    // Check if all required elements exist
+    if (!roadNameElement || !roadTypeElement || !responseTimeElement) {
+        console.error('❌ Missing form elements:', {
+            roadName: !!roadNameElement,
+            roadType: !!roadTypeElement,
+            responseTime: !!responseTimeElement
+        });
+        alert("Form elements are missing. Please refresh the page and try again.");
+        return;
+    }
+
+    // Get values safely
+    const roadName = roadNameElement.value.trim();
+    const roadType = roadTypeElement.value;
+    const responseTime = parseInt(responseTimeElement.value) || 0;
     // Description field was removed from the form
     const description = "";
 
-    if (!roadName || !responseTime || responseTime === 0) {
-        alert("Please select defects and ensure road is properly selected");
+    if (!roadName) {
+        alert("Please select a road location on the map");
         return;
     }
 
@@ -537,15 +702,31 @@ async function submitReport() {
         selectedDefects.push(checkbox.value);
     });
 
+    if (selectedDefects.length === 0) {
+        alert("Please select at least one defect type");
+        return;
+    }
+
+    // Ensure we have a valid response time - recalculate if needed
+    const calculatedResponseTime = calculateResponseTime(selectedDefects);
+    const finalResponseTime = calculatedResponseTime > 0 ? calculatedResponseTime : 7; // Default to 7 days
+
+    console.log('🔍 Response time calculation:', {
+        formResponseTime: responseTime,
+        calculatedResponseTime: calculatedResponseTime,
+        finalResponseTime: finalResponseTime,
+        selectedDefects: selectedDefects
+    });
+
     // Prepare data for Supabase with correct field names
     const supabaseData = {
         defects: selectedDefects.join(', '),
-        severity: severity,
         road_name: roadName,
         road_type: roadType,
         description: description || `${roadType} road with defects: ${selectedDefects.join(', ')}`,
         latitude: roadNodes.length > 0 ? roadNodes[0].lat : null,
         longitude: roadNodes.length > 0 ? roadNodes[0].lng : null,
+        response_time: finalResponseTime, // Use the calculated final response time
         reporter_name: null, // Can be added later if needed
         reporter_contact: null // Can be added later if needed
     };
@@ -591,12 +772,18 @@ async function submitReport() {
 
 // Clear report form
 function clearReportForm() {
-    // Description field was removed from the form
-    document.getElementById("responseTime").value = "0";
+    // Reset form fields safely
+    const responseTimeElement = document.getElementById("responseTime");
+    const severityElement = document.getElementById("severity");
+    
+    if (responseTimeElement) responseTimeElement.value = "0";
+    if (severityElement) severityElement.value = "medium"; // Reset to default
+    
     clearSelection();
 }
 
-// Remove report
+// Remove report function - disabled as Actions column was removed
+/*
 async function removeReport(id) {
     if (!window.DatabaseService || !DatabaseService.isAvailable()) {
         console.log('⚠️ Database not available - cannot remove report');
@@ -622,14 +809,9 @@ async function removeReport(id) {
         alert('Error deleting report: ' + error.message);
     }
 }
+*/
 
-// Get severity score
-function getSeverityScore(severity) {
-    const scores = { critical: 4, high: 3, medium: 2, low: 1 };
-    return scores[severity] || 0;
-}
-
-// Calculate severity score
+// // Calculate severity score for individual report
 function calculateSeverityScore(report) {
     // Road Type Score (RTS)
     const rts = roadTypeScores[report.roadType] || roadTypeScores[report.road_type] || 50;
@@ -637,41 +819,176 @@ function calculateSeverityScore(report) {
     // Road Defect Score (RDS) - calculate based on defects
     let rds = 0;
     const defects = Array.isArray(report.defects) ? report.defects : [report.defects];
-    defects.forEach(defect => {
-        if (defectData[defect]) {
-            rds += defectData[defect].days * 2; // Convert days to score
+    
+    // Map defect response times to scores and sum them
+    const uniqueDefects = [...new Set(defects)]; // Remove duplicates
+    const defectScoreDetails = [];
+    
+    uniqueDefects.forEach(defect => {
+        if (defectData[defect] && defectData[defect].days) {
+            const responseTime = defectData[defect].days;
+            let defectScore = 0;
+            
+            // Improved consistent mapping: 3→20, 7→40, 10→60, 15→80, 30→100
+            if (responseTime <= 3) defectScore = 20;
+            else if (responseTime <= 7) defectScore = 40;
+            else if (responseTime <= 10) defectScore = 60;
+            else if (responseTime <= 15) defectScore = 80;
+            else defectScore = 100;
+            
+            rds += defectScore;
+            defectScoreDetails.push({ defect, responseTime, score: defectScore });
         }
     });
     
-    // Severity multiplier
-    const severityMultiplier = {
-        'critical': 4,
-        'high': 3,
-        'medium': 2,
-        'low': 1
-    };
-    const multiplier = severityMultiplier[report.severity] || 1;
+    // ✅ ENHANCED: Report Frequency Score using frequency table
+    const reportCount = report.reportCount || 1;
+    const rfs = getReportFrequencyScore(reportCount);
     
-    // Report Frequency Score (RFS) - normalized to 0-100
-    const rfs = Math.min(100, (report.reportCount || 1) * 5);
+    // Calculate final severity score using the formula: (RTS × 0.40) + (RDS × 0.50) + (RFS × 0.10)
+    const severityScore = (rts * 0.40) + (rds * 0.50) + (rfs * 0.10);
     
-    // Calculate final severity score
-    const severityScore = (rts * 0.30) + (rds * multiplier * 0.60) + (rfs * 0.10);
+    // Enhanced debug logging for individual severity calculation
+    console.log(`🔢 ENHANCED Individual severity calculation for ${report.roadName || report.road_name}:`, {
+        rts: rts,
+        rds: rds,
+        reportCount: reportCount,
+        rfs: rfs, // Now uses frequency table
+        defectScoreDetails: defectScoreDetails,
+        uniqueDefectsCount: uniqueDefects.length,
+        formula: `(${rts} × 0.40) + (${rds} × 0.50) + (${rfs} × 0.10)`,
+        calculation: `${rts * 0.40} + ${rds * 0.50} + ${rfs * 0.10} = ${severityScore}`,
+        finalScore: Math.round(severityScore),
+        rfsBreakdown: `${reportCount} reports → RFS ${rfs}`
+    });
     
     return Math.round(severityScore);
 }
 
+// Calculate aggregated severity score per road
+function calculateAggregatedSeverityScorePerRoad(roadName, allReports) {
+    // Get all reports for this specific road
+    const roadReports = allReports.filter(report => 
+        report.roadName === roadName || report.road_name === roadName
+    );
+    
+    if (roadReports.length === 0) return 0;
+    
+    // RTS (Road Type Score) - CORRECTED: Only count once per road, not per report
+    const firstReport = roadReports[0];
+    const rts = roadTypeScores[firstReport.roadType] || roadTypeScores[firstReport.road_type] || 50;
+    
+    // Aggregate RDS (sum unique defect response time mappings for this road)
+    let totalRDS = 0;
+    const allDefectsForRoad = [];
+    roadReports.forEach(report => {
+        const defects = Array.isArray(report.defects) ? report.defects : [report.defects];
+        allDefectsForRoad.push(...defects);
+    });
+    
+    // Get unique defects across all reports for this road
+    const uniqueDefectsForRoad = [...new Set(allDefectsForRoad)];
+    const defectScoreDetails = [];
+    
+    uniqueDefectsForRoad.forEach(defect => {
+        if (defectData[defect] && defectData[defect].days) {
+            const responseTime = defectData[defect].days;
+            let defectScore = 0;
+            
+            // Improved consistent mapping: 3→20, 7→40, 10→60, 15→80, 30→100
+            if (responseTime <= 3) defectScore = 20;
+            else if (responseTime <= 7) defectScore = 40;
+            else if (responseTime <= 10) defectScore = 60;
+            else if (responseTime <= 15) defectScore = 80;
+            else defectScore = 100;
+            
+            totalRDS += defectScore;
+            defectScoreDetails.push({ defect, responseTime, score: defectScore });
+        }
+    });
+    
+    // ✅ ENHANCED: Aggregate RFS using frequency table
+    const totalReportCount = roadReports.length;
+    const aggregatedRFS = getReportFrequencyScore(totalReportCount);
+    
+    // Apply the aggregation formula: (RTS × 0.40) + (∑RDS × 0.50) + (RFS × 0.10)
+    // CORRECTED: RTS is single value, not summed
+    const aggregatedSeverityScore = (rts * 0.40) + (totalRDS * 0.50) + (aggregatedRFS * 0.10);
+    
+    console.log(`🔢 ENHANCED Aggregated severity calculation for road "${roadName}":`, {
+        roadType: firstReport.roadType || firstReport.road_type,
+        rts: rts, // Single value (not totalRTS)
+        totalRDS,
+        totalReportCount: totalReportCount,
+        aggregatedRFS: aggregatedRFS,
+        defectScoreDetails: defectScoreDetails,
+        uniqueDefectsCount: uniqueDefectsForRoad.length,
+        totalDefectsCount: allDefectsForRoad.length,
+        formula: `(${rts} × 0.40) + (${totalRDS} × 0.50) + (${aggregatedRFS} × 0.10)`,
+        calculation: `${rts * 0.40} + ${totalRDS * 0.50} + ${aggregatedRFS * 0.10} = ${aggregatedSeverityScore}`,
+        finalScore: Math.round(aggregatedSeverityScore),
+        rfsBreakdown: `${totalReportCount} reports → RFS ${aggregatedRFS}`
+    });
+    
+    return Math.round(aggregatedSeverityScore);
+}
+
+// Group reports by road name
+function groupReportsByRoad(allReports) {
+    const roadGroups = {};
+    
+    allReports.forEach(report => {
+        const roadName = report.roadName || report.road_name;
+        if (!roadGroups[roadName]) {
+            roadGroups[roadName] = {
+                roadName: roadName,
+                roadType: report.roadType || report.road_type,
+                reports: [],
+                reportCount: 0,
+                defects: [],
+                responseTime: 0,
+                latlng: report.latlng || [14.5995, 120.9842],
+                created_at: report.created_at
+            };
+        }
+        
+        roadGroups[roadName].reports.push(report);
+        roadGroups[roadName].reportCount++;
+        
+        // Collect all defects for this road
+        const reportDefects = Array.isArray(report.defects) ? report.defects : [report.defects];
+        roadGroups[roadName].defects.push(...reportDefects);
+        
+        // Use the earliest created_at date
+        if (!roadGroups[roadName].created_at || new Date(report.created_at) < new Date(roadGroups[roadName].created_at)) {
+            roadGroups[roadName].created_at = report.created_at;
+        }
+    });
+    
+    // Process grouped data
+    Object.values(roadGroups).forEach(roadGroup => {
+        // Remove duplicate defects and calculate response time
+        roadGroup.defects = [...new Set(roadGroup.defects)];
+        roadGroup.responseTime = calculateResponseTime(roadGroup.defects);
+    });
+    
+    return Object.values(roadGroups);
+}
+
 // Calculate response time based on defects
+// If the same defect appears multiple times (from different reports), count it only once.
 function calculateResponseTime(defects) {
     let totalDays = 0;
+    // Flatten and deduplicate defects
     const defectList = Array.isArray(defects) ? defects : [defects];
-    
-    defectList.forEach(defect => {
+    const uniqueDefects = [...new Set(defectList)];
+
+    uniqueDefects.forEach(defect => {
         if (defectData[defect]) {
             totalDays += defectData[defect].days;
         }
     });
-    
+
     return totalDays || 7; // Default to 7 days if no defects match
 }
 
@@ -686,7 +1003,7 @@ function updateReportsTable() {
     }
 
     if (reports.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No reports submitted yet. Be the first to report a road defect!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No reports submitted yet. Be the first to report a road defect!</td></tr>';
         return;
     }
 
@@ -718,7 +1035,6 @@ function updateReportsTable() {
                 road_name: report.roadName,
                 road_type: report.roadType,
                 defects: report.defects,
-                severity: report.severity,
                 created_at: report.created_at,
                 formatted_date: dateCreated
             });
@@ -728,12 +1044,8 @@ function updateReportsTable() {
                     <td><strong>${report.roadName}</strong></td>
                     <td><span class="road-${report.roadType.replace(' ', '-')}">${report.roadType}</span></td>
                     <td>${defectsDisplay}</td>
-                    <td><span class="severity-${report.severity}">${report.severity.toUpperCase()}</span></td>
                     <td>${report.responseTime || 'N/A'} days</td>
-                    <td><strong>${report.reportCount || 1}</strong></td>
-                    <td><strong>${report.severityScore}</strong></td>
                     <td>${dateCreated}</td>
-                    <td><button class="btn-danger" onclick="removeReport(${report.id})">Remove</button></td>
                 </tr>
             `;
         })
@@ -751,9 +1063,13 @@ function updateStats() {
     }
     
     if (criticalIssuesElement) {
-        criticalIssuesElement.textContent = reports.filter(
-            (r) => r.severity === "critical"
-        ).length;
+        // Group reports by road and calculate aggregated severity scores
+        const roadGroups = groupReportsByRoad(reports);
+        const criticalRoads = roadGroups.filter(roadGroup => {
+            const aggregatedSeverity = calculateAggregatedSeverityScorePerRoad(roadGroup.roadName, reports);
+            return aggregatedSeverity >= 300; // Consider severity >= 300 as critical
+        });
+        criticalIssuesElement.textContent = criticalRoads.length;
     }
     
     if (avgResponseTimeElement) {
@@ -812,22 +1128,17 @@ function knapsackOptimization(reports, timeBudget) {
     };
 }
 
-// Enhanced QuickSort Implementation with comprehensive prioritization
+// Enhanced QuickSort Implementation for severity-based prioritization
 function quickSortPrioritization(arr) {
     if (arr.length <= 1) {
         return arr;
     }
 
-    // Calculate comprehensive priority score for each report
-    const reportsWithPriority = arr.map(report => ({
-        ...report,
-        priorityScore: calculateComprehensivePriorityScore(report)
-    }));
-
-    return quickSortRecursive(reportsWithPriority);
+    // Sort directly by severity score (highest first)
+    return quickSortRecursiveBySeverity([...arr]);
 }
 
-function quickSortRecursive(arr) {
+function quickSortRecursiveBySeverity(arr) {
     if (arr.length <= 1) {
         return arr;
     }
@@ -837,14 +1148,18 @@ function quickSortRecursive(arr) {
     const right = [];
 
     for (let i = 1; i < arr.length; i++) {
-        if (arr[i].priorityScore > pivot.priorityScore) {
+        // Sort by severity score (highest first)
+        const currentSeverity = arr[i].aggregatedSeverityScore || arr[i].severityScore || 0;
+        const pivotSeverity = pivot.aggregatedSeverityScore || pivot.severityScore || 0;
+        
+        if (currentSeverity > pivotSeverity) {
             left.push(arr[i]);
         } else {
             right.push(arr[i]);
         }
     }
 
-    return [...quickSortRecursive(left), pivot, ...quickSortRecursive(right)];
+    return [...quickSortRecursiveBySeverity(left), pivot, ...quickSortRecursiveBySeverity(right)];
 }
 
 // Calculate comprehensive priority score (matches admin dashboard logic)
@@ -852,13 +1167,9 @@ function calculateComprehensivePriorityScore(report) {
     // 1. Road Type Score (40% weight)
     const roadTypeScore = roadTypeScores[report.roadType] || 25;
     
-    // 2. Severity Factor (30% weight)
-    const severityWeights = {
-        'high': 100,
-        'medium': 60,
-        'low': 30
-    };
-    const severityScore = severityWeights[report.severity] || 30;
+    // 2. Use aggregated severity score instead of individual severity (30% weight)
+    const aggregatedSeverity = report.aggregatedSeverityScore || report.severityScore || 50;
+    const severityScore = Math.min(100, aggregatedSeverity / 4); // Normalize to 0-100 range
     
     // 3. Defect Urgency Score (20% weight)
     let defectUrgencyScore = 0;
@@ -898,100 +1209,159 @@ function runOptimization() {
     const timeBudget =
         parseInt(document.getElementById("maintenanceBudget").value) || 180;
 
-    // Knapsack optimization
-    const knapsackResult = knapsackOptimization(reports, timeBudget);
-    document.getElementById("knapsackResults").innerHTML = `
-        <p><strong>Total Severity Score:</strong> ${knapsackResult.totalValue}</p>
-        <p><strong>Time Required:</strong> ${knapsackResult.totalTime} days</p>
-        <p><strong>Selected Roads:</strong></p>
-        ${knapsackResult.selectedReports
-            .map(
-                (r, i) => `
-                <div class="road-item">
-                    <strong>${r.roadName}</strong><br>
-                    Severity: ${r.severity} | Response Time: ${r.responseTime} days<br>
-                    Score: ${r.severityScore}
-                    <div class="score-breakdown">
-                        <div class="score-row">
-                            <span>Road Type Score:</span>
-                            <span class="score-value">${roadTypeScores[r.roadType] || 0}</span>
-                        </div>
-                        <div class="score-row">
-                            <span>Report Count Score:</span>
-                            <span class="score-value">${Math.min(100, r.reportCount * 5)}</span>
-                        </div>
-                    </div>
-                </div>
-            `
-            )
-            .join("")}
-    `;
+    // Group reports by road and calculate aggregated severity scores
+    const roadGroups = groupReportsByRoad(reports);
+    const roadsWithAggregatedScores = roadGroups.map(roadGroup => ({
+        ...roadGroup,
+        severityScore: calculateAggregatedSeverityScorePerRoad(roadGroup.roadName, reports),
+        aggregatedSeverityScore: calculateAggregatedSeverityScorePerRoad(roadGroup.roadName, reports)
+    }));
 
-    // QuickSort optimization with enhanced prioritization
-    const sortedReports = quickSortPrioritization([...knapsackResult.selectedReports]);
-    document.getElementById("quicksortResults").innerHTML = `
-        <p><strong>Prioritized Maintenance Order (Enhanced Algorithm):</strong></p>
-        ${sortedReports
-            .map(
-                (r, i) => `
-                <div class="road-item">
-                    <strong>Priority ${i + 1}: ${r.roadName}</strong><br>
-                    Severity: ${r.severity} | Priority Score: ${r.priorityScore || r.severityScore}<br>
-                    Response Time: ${r.responseTime} days | Defects: ${Array.isArray(r.defects) ? r.defects.join(', ') : r.defects}<br>
-                    <div class="score-breakdown">
-                        <div class="score-row">
-                            <span>Road Type (${r.roadType}):</span>
-                            <span class="score-value">${roadTypeScores[r.roadType] || 25}</span>
-                        </div>
-                        <div class="score-row">
-                            <span>Severity Weight:</span>
-                            <span class="score-value">${r.severity === 'high' ? 100 : r.severity === 'medium' ? 60 : 30}</span>
-                        </div>
-                    </div>
+    // QuickSort optimization with enhanced prioritization using all roads
+    const sortedReports = quickSortPrioritization([...roadsWithAggregatedScores]);
+    
+    // Update the admin page prioritization results
+    const quicksortResultsElement = document.getElementById("quicksortResultsList");
+    if (quicksortResultsElement) {
+        quicksortResultsElement.innerHTML = `
+            <div class="analysis-results">
+                <h4>🎯 Prioritized Maintenance Order</h4>
+                <p><strong>Analysis based on severity scores and resource optimization</strong></p>
+                <div class="priority-list">
+                    ${sortedReports.slice(0, 10).map((road, index) => {
+                        const rankIcon = index === 0 ? '🔴' : index === 1 ? '🟠' : index === 2 ? '🟡' : '🔵';
+                        const priorityClass = index < 3 ? 'high-priority' : index < 6 ? 'medium-priority' : 'low-priority';
+                        
+                        return `
+                            <div class="priority-item ${priorityClass}">
+                                <div class="priority-rank">
+                                    <span class="priority-icon">${rankIcon}</span>
+                                    <span class="priority-number">${index + 1}</span>
+                                </div>
+                                <div class="priority-details">
+                                    <h5>${road.roadName}</h5>
+                                    <div class="priority-stats">
+                                        <span class="road-type-badge ${road.roadType ? road.roadType.toLowerCase() : 'unknown'}">${road.roadType || 'Unknown'}</span>
+                                        <span class="severity-score">Score: ${road.aggregatedSeverityScore}</span>
+                                        <span class="report-count">${road.reportCount} reports</span>
+                                    </div>
+                                    <div class="defects-list">
+                                        <strong>Defects:</strong> ${Array.isArray(road.defects) ? road.defects.join(', ') : road.defects}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
-            `
-            )
-            .join("")}
-    `;
-
-    // Dijkstra route planning (simulated)
-    document.getElementById("dijkstraResults").innerHTML = `
-        <h3>🗺️ Dijkstra Route Planning</h3>
-        <p><strong>Purpose:</strong> Find optimal alternative routes during maintenance periods</p>
-        <div class="route-visualization">
-            <h4>Optimal Maintenance Route</h4>
-            <div class="route-step">
-                <span>🏁 Start: Maintenance Depot</span>
+                ${sortedReports.length > 10 ? `<p class="more-results">... and ${sortedReports.length - 10} more roads</p>` : ''}
             </div>
-            ${sortedReports
+        `;
+    }
+
+    // Also update knapsack optimization if element exists (for test page compatibility)
+    const knapsackElement = document.getElementById("knapsackResults");
+    if (knapsackElement) {
+        const knapsackResult = knapsackOptimization(roadsWithAggregatedScores, timeBudget);
+        knapsackElement.innerHTML = `
+            <p><strong>Time Required:</strong> ${knapsackResult.totalTime} days</p>
+            <p><strong>Selected Roads:</strong></p>
+            ${knapsackResult.selectedReports
                 .map(
                     (r, i) => `
-                    <div class="route-step">
-                        <span class="route-arrow">→</span>
-                        <span>${i + 1}. ${r.roadName}</span>
+                    <div class="road-item">
+                        <strong>${r.roadName}</strong><br>
+                        Response Time: ${r.responseTime} days<br>
+                        Severity Score: ${r.aggregatedSeverityScore || r.severityScore}
+                        <div class="score-breakdown">
+                            <div class="score-row">
+                                <span>Road Type Score:</span>
+                                <span class="score-value">${roadTypeScores[r.roadType] || 0}</span>
+                            </div>
+                            <div class="score-row">
+                                <span>Report Frequency Score:</span>
+                                <span class="score-value">${getReportFrequencyScore(r.reportCount || 1)}</span>
+                            </div>
+                        </div>
                     </div>
                 `
                 )
                 .join("")}
-            <div class="route-step">
-                <span class="route-arrow">→</span>
-                <span>🏁 Return to Depot</span>
+        `;
+    }
+
+    // Update quicksort results for test page compatibility
+    const quicksortElement = document.getElementById("quicksortResults");
+    if (quicksortElement) {
+        quicksortElement.innerHTML = `
+            <p><strong>QuickSort Prioritization (Sorted by Severity Score):</strong></p>
+            ${sortedReports
+                .map(
+                    (r, i) => `
+                    <div class="road-item">
+                        <strong>Priority ${i + 1}: ${r.roadName}</strong><br>
+                        Severity Score: ${r.aggregatedSeverityScore || r.severityScore || 0} | Response Time: ${r.responseTime} days <br>
+                        Defects: ${Array.isArray(r.defects) ? r.defects.join(', ') : r.defects}<br>
+                        <div class="score-breakdown">
+                            <div class="score-row">
+                                <span>Road Type Score:</span>
+                                <span class="score-value">${roadTypeScores[r.roadType] || 25}</span>
+                            </div>
+                            <div class="score-row">
+                                <span>Severity Score:</span>
+                                <span class="score-value">${r.aggregatedSeverityScore || r.severityScore || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+                )
+                .join("")}
+        `;
+    }
+
+    // Update dijkstra results for test page compatibility
+    const dijkstraElement = document.getElementById("dijkstraResults");
+    if (dijkstraElement) {
+        dijkstraElement.innerHTML = `
+            <h3>🗺️ Dijkstra Route Planning</h3>
+            <p><strong>Purpose:</strong> Find optimal alternative routes during maintenance periods</p>
+            <div class="route-visualization">
+                <h4>Optimal Maintenance Route</h4>
+                <div class="route-step">
+                    <span>🏁 Start: Maintenance Depot</span>
+                </div>
+                ${sortedReports
+                    .map(
+                        (r, i) => `
+                        <div class="route-step">
+                            <span class="route-arrow">→</span>
+                            <span>${i + 1}. ${r.roadName}</span>
+                        </div>
+                    `
+                    )
+                    .join("")}
+                <div class="route-step">
+                    <span class="route-arrow">→</span>
+                    <span>🏁 Return to Depot</span>
+                </div>
             </div>
-        </div>
-        <p><strong>Total Distance:</strong> ${(Math.random() * 100 + 50).toFixed(1)} km</p>
-        <p><strong>Estimated Travel Time:</strong> ${(Math.random() * 5 + 2).toFixed(1)} hours</p>
-    `;
+            <p><strong>Total Distance:</strong> ${(Math.random() * 100 + 50).toFixed(1)} km</p>
+            <p><strong>Estimated Travel Time:</strong> ${(Math.random() * 5 + 2).toFixed(1)} hours</p>
+        `;
+    }
 
-    // Show results
-    document.getElementById("algorithmResults").style.display = "grid";
+    // Show results (for test page compatibility)
+    const algorithmResultsElement = document.getElementById("algorithmResults");
+    if (algorithmResultsElement) {
+        algorithmResultsElement.style.display = "grid";
+    }
 
-    // Update budget utilization
-    const utilization = Math.round(
-        (knapsackResult.totalTime / timeBudget) * 100
-    );
-    document.getElementById(
-        "budgetUtilization"
-    ).textContent = `${utilization}%`;
+    // Update budget utilization (for test page compatibility)
+    const budgetUtilizationElement = document.getElementById("budgetUtilization");
+    if (budgetUtilizationElement) {
+        const knapsackResult = knapsackOptimization(roadsWithAggregatedScores, timeBudget);
+        const utilization = Math.round((knapsackResult.totalTime / timeBudget) * 100);
+        budgetUtilizationElement.textContent = `${utilization}%`;
+    }
 
     // Generate maintenance schedule
     generateMaintenanceSchedule(sortedReports);
@@ -1149,3 +1519,37 @@ function updateVisualization(sortedReports) {
         roadList.appendChild(roadItem);
     });
 }
+
+// Calculate distance between two latlng points in meters
+function calculateDistance(latlng1, latlng2) {
+    const earthRadius = 6371e3; // Earth radius in meters
+
+    const lat1Rad = latlng1.lat * Math.PI / 180;
+    const lat2Rad = latlng2.lat * Math.PI / 180;
+    const deltaLatRad = (latlng2.lat - latlng1.lat) * Math.PI / 180;
+    const deltaLngRad = (latlng2.lng - latlng1.lng) * Math.PI / 180;
+
+    const a = Math.sin(deltaLatRad / 2) * Math.sin(deltaLatRad / 2) +
+            Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+            Math.sin(deltaLngRad / 2) * Math.sin(deltaLngRad / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return earthRadius * c; // Distance in meters
+}
+
+// Enhanced Report Frequency Score mapping based on frequency table
+function getReportFrequencyScore(reportCount) {
+    if (reportCount >= 1 && reportCount <= 10) return 10;
+    else if (reportCount >= 11 && reportCount <= 20) return 20;
+    else if (reportCount >= 21 && reportCount <= 30) return 30;
+    else if (reportCount >= 31 && reportCount <= 40) return 40;
+    else if (reportCount >= 41 && reportCount <= 50) return 50;
+    else if (reportCount >= 51 && reportCount <= 60) return 60;
+    else if (reportCount >= 61 && reportCount <= 70) return 70;
+    else if (reportCount >= 71 && reportCount <= 80) return 80;
+    else if (reportCount >= 81 && reportCount <= 90) return 90;
+    else if (reportCount >= 91) return 100;
+    else return 10; // Default for any edge cases
+}
+

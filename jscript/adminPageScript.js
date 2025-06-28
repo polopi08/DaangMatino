@@ -46,6 +46,14 @@ async function initializeDashboard() {
         console.log('Loading pie chart...');
         await loadPieChart();
         
+        // Load most reported roads leaderboard
+        console.log('Loading most reported roads leaderboard...');
+        await loadMostReportedRoads();
+        
+        // Auto-run prioritization analysis
+        console.log('Auto-running prioritization analysis...');
+        await autoRunPrioritizationAnalysis();
+        
         console.log('Dashboard initialized successfully');
     } catch (error) {
         console.error('Error initializing dashboard:', error);
@@ -490,4 +498,242 @@ function getNotificationIcon(type) {
         case 'error': return 'bx-x-circle';
         default: return 'bx-info-circle';
     }
+}
+
+// Load most reported roads leaderboard
+async function loadMostReportedRoads() {
+    try {
+        console.log('Loading most reported roads leaderboard...');
+        
+        const response = await DatabaseService.getMostReportedRoads(10);
+        const leaderboardContainer = document.getElementById('mostReportedList');
+        
+        if (!leaderboardContainer) {
+            console.error('mostReportedList element not found');
+            return;
+        }
+        
+        if (!response.success || !response.data || response.data.length === 0) {
+            console.log('No roads found for leaderboard');
+            leaderboardContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class='bx bx-info-circle'></i>
+                    <p>No road reports available yet.</p>
+                    <p>Reports will appear here as they are submitted.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const roads = response.data;
+        console.log('Fetched most reported roads:', roads);
+        
+        // Generate leaderboard HTML
+        const leaderboardHTML = roads.map((road, index) => {
+            const rankIcon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+            const roadTypeClass = road.road_type ? road.road_type.toLowerCase().replace(' ', '-') : 'unknown';
+            
+            return `
+                <div class="leaderboard-item" data-rank="${index + 1}">
+                    <div class="rank-indicator">
+                        <span class="rank-number">${rankIcon}</span>
+                    </div>
+                    <div class="road-info">
+                        <h4 class="road-name">${road.road_name}</h4>
+                        <span class="road-type ${roadTypeClass}">${road.road_type || 'Unknown'}</span>
+                    </div>
+                    <div class="road-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">${road.report_count}</span>
+                            <span class="stat-label">Reports</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value severity-score">${road.aggregated_severity}</span>
+                            <span class="stat-label">Severity</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        leaderboardContainer.innerHTML = leaderboardHTML;
+        console.log('Most reported roads leaderboard loaded successfully');
+        
+    } catch (error) {
+        console.error('Error loading most reported roads:', error);
+        const leaderboardContainer = document.getElementById('mostReportedList');
+        if (leaderboardContainer) {
+            leaderboardContainer.innerHTML = `
+                <div class="empty-state error">
+                    <i class='bx bx-error-circle'></i>
+                    <p>Error loading leaderboard data.</p>
+                    <p>Please try refreshing the page.</p>
+                </div>
+            `;
+        }
+    }
+}
+
+// QuickSort implementation for severity-based sorting
+function quickSortBySeverity(arr) {
+    if (arr.length <= 1) {
+        return arr;
+    }
+
+    const pivot = arr[0];
+    const left = [];
+    const right = [];
+
+    for (let i = 1; i < arr.length; i++) {
+        // Sort by severity score (highest first)
+        const currentSeverity = arr[i].aggregatedSeverity || arr[i].severityScore || 0;
+        const pivotSeverity = pivot.aggregatedSeverity || pivot.severityScore || 0;
+        
+        if (currentSeverity > pivotSeverity) {
+            left.push(arr[i]);
+        } else {
+            right.push(arr[i]);
+        }
+    }
+
+    return [...quickSortBySeverity(left), pivot, ...quickSortBySeverity(right)];
+}
+
+// Auto-run prioritization analysis on page load
+async function autoRunPrioritizationAnalysis() {
+    try {
+        console.log('🔄 Auto-running prioritization analysis...');
+        
+        // Get fresh reports data from database
+        const reportsResponse = await DatabaseService.getAllReports();
+        if (!reportsResponse.success || !reportsResponse.data) {
+            throw new Error('Failed to load reports data');
+        }
+        
+        const reports = reportsResponse.data;
+        console.log(`📊 Loaded ${reports.length} reports for analysis`);
+        
+        // Calculate prioritized list based on aggregated severity scores
+        const roadGroups = {};
+        
+        // Group reports by road name
+        reports.forEach(report => {
+            const roadName = report.road_name;
+            if (!roadGroups[roadName]) {
+                roadGroups[roadName] = {
+                    roadName: roadName,
+                    roadType: report.road_type || 'municipal',
+                    reports: [],
+                    reportCount: 0,
+                    defects: [],
+                    responseTime: 0
+                };
+            }
+            
+            roadGroups[roadName].reports.push(report);
+            roadGroups[roadName].reportCount++;
+            
+            // Collect all defects for this road
+            const reportDefects = Array.isArray(report.defects) ? report.defects : 
+                                  typeof report.defects === 'string' ? report.defects.split(', ') : 
+                                  [report.defects];
+            roadGroups[roadName].defects.push(...reportDefects);
+        });
+        
+        // Calculate aggregated severity scores for each road
+        const roadsWithScores = Object.values(roadGroups).map(roadGroup => {
+            // Remove duplicate defects and calculate response time
+            roadGroup.defects = [...new Set(roadGroup.defects)];
+            
+            // Calculate aggregated severity score using Supabase method
+            const aggregatedSeverity = DatabaseService.calculateAggregatedSeverityForRoad(roadGroup.roadName, reports);
+            
+            return {
+                ...roadGroup,
+                aggregatedSeverity: aggregatedSeverity,
+                severityScore: aggregatedSeverity, // Use severity as the primary score
+                aggregatedSeverityScore: aggregatedSeverity
+            };
+        });
+        
+        // Sort using QuickSort by severity score (highest first) 
+        const sortedRoads = quickSortBySeverity([...roadsWithScores]);
+        
+        console.log('🎯 QuickSort prioritized roads calculated:', sortedRoads.slice(0, 5));
+        
+        // Update the prioritization results display
+        const quicksortResultsElement = document.getElementById("quicksortResultsList");
+        if (quicksortResultsElement) {
+            if (sortedRoads.length === 0) {
+                quicksortResultsElement.innerHTML = `
+                    <div class="empty-state">
+                        <i class='bx bx-info-circle'></i>
+                        <p>No road reports available yet.</p>
+                        <p>Submit some reports to see the prioritized maintenance schedule!</p>
+                    </div>
+                `;
+            } else {
+                quicksortResultsElement.innerHTML = `
+                    <div class="analysis-results">
+                        <h4>🎯 QuickSort Prioritization (Sorted by Severity Score)</h4>
+                        <p><strong>Roads prioritized using QuickSort algorithm based on aggregated severity scores</strong></p>
+                        <div class="priority-list">
+                            ${sortedRoads.slice(0, 10).map((road, index) => {
+                                const rankIcon = index === 0 ? '🔴' : index === 1 ? '🟠' : index === 2 ? '🟡' : '🔵';
+                                const priorityClass = index < 3 ? 'high-priority' : index < 6 ? 'medium-priority' : 'low-priority';
+                                
+                                return `
+                                    <div class="priority-item ${priorityClass}">
+                                        <div class="priority-rank">
+                                            <span class="priority-icon">${rankIcon}</span>
+                                            <span class="priority-number">${index + 1}</span>
+                                        </div>
+                                        <div class="priority-details">
+                                            <h5>${road.roadName}</h5>
+                                            <div class="priority-stats">
+                                                <span class="road-type-badge ${road.roadType ? road.roadType.toLowerCase().replace(' ', '-') : 'unknown'}">${road.roadType || 'Unknown'}</span>
+                                                <span class="severity-score">Severity: ${road.aggregatedSeverity}</span>
+                                                <span class="report-count">${road.reportCount} reports</span>
+                                            </div>
+                                            <div class="defects-list">
+                                                <strong>Defects:</strong> ${road.defects.join(', ') || 'Not specified'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        ${sortedRoads.length > 10 ? `<p class="more-results">... and ${sortedRoads.length - 10} more roads</p>` : ''}
+                        <div class="analysis-footer">
+                            <p><small>Analysis updated: ${new Date().toLocaleString()}</small></p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        console.log('✅ Prioritization analysis completed successfully');
+        
+    } catch (error) {
+        console.error('❌ Error running auto prioritization analysis:', error);
+        
+        // Display error in the prioritization results
+        const quicksortResultsElement = document.getElementById("quicksortResultsList");
+        if (quicksortResultsElement) {
+            quicksortResultsElement.innerHTML = `
+                <div class="empty-state error">
+                    <i class='bx bx-error-circle'></i>
+                    <p>Error generating prioritization analysis.</p>
+                    <p>Error: ${error.message}</p>
+                    <p>Please try clicking "Run DaangMatino Analysis" manually.</p>
+                </div>
+            `;
+        }
+    }
+}
+
+// Wrapper function for manual optimization run (for the admin page button)
+function runOptimization() {
+    console.log('🔄 Manual optimization triggered...');
+    autoRunPrioritizationAnalysis();
 }

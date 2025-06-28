@@ -64,16 +64,16 @@ class DatabaseService {
             demo: true,
             data: {
                 total: 15,
-                bySeverity: {
-                    'high': 7,
-                    'medium': 6,
-                    'low': 2
-                },
                 byDefects: {
                     'Pothole': 6,
                     'Damaged Road': 4,
                     'Flooding': 3,
                     'Traffic Light Issue': 2
+                },
+                byRoadType: {
+                    'Municipal': 8,
+                    'National': 4,
+                    'Provincial': 3
                 },
                 recent: 5
             }
@@ -88,7 +88,6 @@ class DatabaseService {
                     id: 1,
                     public_id: 'RPT-000001',
                     defects: ['Pothole'],
-                    severity: 'High',
                     location_description: 'Corner of Main St. and Oak Ave.',
                     created_at: new Date().toISOString(),
                     reporter_name: 'John Doe',
@@ -99,7 +98,6 @@ class DatabaseService {
                     id: 2,
                     public_id: 'RPT-000002',
                     defects: ['Damaged Road'],
-                    severity: 'Medium',
                     location_description: 'Highway 101 near Exit 15',
                     created_at: new Date(Date.now() - 86400000).toISOString(),
                     reporter_name: 'Jane Smith',
@@ -110,7 +108,6 @@ class DatabaseService {
                     id: 3,
                     public_id: 'RPT-000003',
                     defects: ['Traffic Light Issue'],
-                    severity: 'High',
                     location_description: 'Intersection of First St. and Broadway',
                     created_at: new Date(Date.now() - 172800000).toISOString(),
                     reporter_name: null,
@@ -121,7 +118,6 @@ class DatabaseService {
                     id: 4,
                     public_id: 'RPT-000004',
                     defects: ['Flooding'],
-                    severity: 'High',
                     location_description: 'Downtown Bridge Area',
                     created_at: new Date(Date.now() - 259200000).toISOString(),
                     reporter_name: 'Mike Wilson',
@@ -132,7 +128,6 @@ class DatabaseService {
                     id: 5,
                     public_id: 'RPT-000005',
                     defects: ['Damaged Road'],
-                    severity: 'Low',
                     location_description: 'Residential Lane 5',
                     created_at: new Date(Date.now() - 345600000).toISOString(),
                     reporter_name: 'Sarah Davis',
@@ -143,7 +138,6 @@ class DatabaseService {
                     id: 6,
                     public_id: 'RPT-000006',
                     defects: ['Pothole'],
-                    severity: 'High',
                     location_description: 'Main Highway Intersection',
                     created_at: new Date(Date.now() - 432000000).toISOString(),
                     reporter_name: 'Emergency Services',
@@ -154,7 +148,6 @@ class DatabaseService {
                     id: 7,
                     public_id: 'RPT-000007',
                     defects: ['Road Marking'],
-                    severity: 'Medium',
                     location_description: 'School Zone Area',
                     created_at: new Date(Date.now() - 518400000).toISOString(),
                     reporter_name: 'School Principal',
@@ -189,11 +182,10 @@ class DatabaseService {
             road_name: reportData.roadName || reportData.road_name || '',
             road_type: reportData.roadType || reportData.road_type || 'unknown',
             defects: defectsArray, // Now properly formatted as array
-            severity: reportData.severity || 'medium',
             description: reportData.description || '',
             latitude: reportData.latitude || null,
             longitude: reportData.longitude || null,
-            response_time: reportData.responseTime || null,
+            response_time: reportData.response_time || reportData.responseTime || 7, // Handle both snake_case and camelCase, with default
             severity_score: reportData.severityScore || 50,
             report_count: 1
         };
@@ -573,14 +565,14 @@ class DatabaseService {
         try {
             const { data, error } = await supabase
                 .from('road_reports')
-                .select('severity, defects, created_at');
+                .select('defects, created_at, road_name, road_type');
 
             if (error) throw error;
 
             const stats = {
                 total: data.length,
-                bySeverity: this.groupBy(data, 'severity'),
                 byDefects: this.groupByDefects(data), // Special handling for defects array
+                byRoadType: this.groupBy(data, 'road_type'),
                 recent: data.filter(report => {
                     const reportDate = new Date(report.created_at);
                     const weekAgo = new Date();
@@ -616,6 +608,241 @@ class DatabaseService {
             });
             return result;
         }, {});
+    }
+
+    // Get comprehensive analytics data
+    static async getAnalytics() {
+        if (!this.isAvailable()) {
+            console.log('📊 Demo mode: Returning sample analytics');
+            return {
+                success: true,
+                data: {
+                    total: 12,
+                    recent: 5,
+                    byDefects: {
+                        'potholes': 4,
+                        'road markings': 3,
+                        'damaged road': 2,
+                        'flooding': 2,
+                        'traffic light issue': 1
+                    },
+                    byRoadType: {
+                        'municipal': 6,
+                        'national': 3,
+                        'provincial': 2,
+                        'barangay road': 1
+                    }
+                }
+            };
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from('road_reports')
+                .select('*');
+
+            if (error) throw error;
+
+            const analytics = {
+                total: data.length,
+                recent: data.filter(report => {
+                    const reportDate = new Date(report.created_at);
+                    const weekAgo = new Date();
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    return reportDate >= weekAgo;
+                }).length,
+                byDefects: this.groupByDefects(data),
+                byRoadType: this.groupBy(data, 'road_type')
+            };
+
+            return { success: true, data: analytics };
+        } catch (error) {
+            console.error('Error fetching analytics:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // Get most reported roads leaderboard
+    static async getMostReportedRoads(limit = 10) {
+        if (!this.isAvailable()) {
+            console.log('📊 Demo mode: Returning sample most reported roads');
+            return {
+                success: true,
+                data: [
+                    { road_name: 'Main Street', report_count: 5, road_type: 'Municipal', aggregated_severity: 285 },
+                    { road_name: 'Highway 101', report_count: 4, road_type: 'National', aggregated_severity: 320 },
+                    { road_name: 'First Street', report_count: 3, road_type: 'Municipal', aggregated_severity: 225 },
+                    { road_name: 'Downtown Bridge', report_count: 2, road_type: 'Provincial', aggregated_severity: 190 },
+                    { road_name: 'School Zone', report_count: 2, road_type: 'Municipal', aggregated_severity: 165 }
+                ]
+            };
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from('road_reports')
+                .select('road_name, road_type, defects, response_time, created_at');
+
+            if (error) throw error;
+
+            // Group reports by road_name and calculate aggregated metrics
+            const roadGroups = data.reduce((groups, report) => {
+                const roadName = report.road_name;
+                if (!groups[roadName]) {
+                    groups[roadName] = {
+                        road_name: roadName,
+                        road_type: report.road_type,
+                        reports: [],
+                        report_count: 0
+                    };
+                }
+                groups[roadName].reports.push(report);
+                groups[roadName].report_count++;
+                return groups;
+            }, {});
+
+            // Calculate aggregated severity scores and format result
+            const roadList = Object.values(roadGroups).map(roadGroup => {
+                // Calculate aggregated severity score for this road
+                const aggregatedSeverity = this.calculateAggregatedSeverityForRoad(roadGroup.road_name, data);
+                
+                return {
+                    road_name: roadGroup.road_name,
+                    report_count: roadGroup.report_count,
+                    road_type: roadGroup.road_type,
+                    aggregated_severity: aggregatedSeverity
+                };
+            });
+
+            // Sort by report count (descending) and then by aggregated severity (descending)
+            roadList.sort((a, b) => {
+                if (a.report_count !== b.report_count) {
+                    return b.report_count - a.report_count;
+                }
+                return b.aggregated_severity - a.aggregated_severity;
+            });
+
+            return { 
+                success: true, 
+                data: roadList.slice(0, limit) 
+            };
+        } catch (error) {
+            console.error('Error fetching most reported roads:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // Helper function to calculate aggregated severity score per road (server-side)
+    static calculateAggregatedSeverityForRoad(roadName, allReports) {
+        // Road Type Scores
+        const roadTypeScores = {
+            "national road": 100,
+            "national": 100,
+            "municipal": 75,
+            "barangay road": 50,
+            "provincial": 60,
+            "bypass road": 25,
+            "Unnamed Road": 25
+        };
+
+        // Defects mapping with response times
+        const defectData = {
+            "Potholes": { days: 3 },
+            "Alligator Cracks": { days: 3 },
+            "Major Scaling": { days: 30 },
+            "Shoving and Corrugation": { days: 10 },
+            "Pumping and Depression": { days: 30 },
+            "No/Faded Road Markings": { days: 15 },
+            "Defects on Shoulders": { days: 7 },
+            "Lush Vegetation": { days: 3 },
+            "Clogged Drains": { days: 3 },
+            "Open Manhole": { days: 10 },
+            "No/Inadequate Sealant in Joints": { days: 3 },
+            "Cracks": { days: 3 },
+            "Raveling": { days: 7 },
+            "Unmaintained Signages and Road Markers": { days: 15 },
+            "Unmaintained Bridges": { days: 15 },
+            "Unmaintained Guardrails": { days: 15 }
+        };
+
+        // Get all reports for this specific road
+        const roadReports = allReports.filter(report => report.road_name === roadName);
+        
+        if (roadReports.length === 0) return 0;
+        
+        // RTS (Road Type Score) - CORRECTED: Only count once per road, not per report
+        const firstReport = roadReports[0];
+        const rts = roadTypeScores[firstReport.road_type] || 50;
+        
+        // Aggregate RDS (sum unique defect response time mappings for this road)
+        let totalRDS = 0;
+        const allDefectsForRoad = [];
+        roadReports.forEach(report => {
+            const defects = Array.isArray(report.defects) ? report.defects : [report.defects];
+            allDefectsForRoad.push(...defects);
+        });
+        
+        // Get unique defects across all reports for this road
+        const uniqueDefectsForRoad = [...new Set(allDefectsForRoad)];
+        const defectScoreDetails = [];
+        
+        uniqueDefectsForRoad.forEach(defect => {
+            if (defectData[defect] && defectData[defect].days) {
+                const responseTime = defectData[defect].days;
+                let defectScore = 0;
+                
+                // Improved consistent mapping: 3→20, 7→40, 10→60, 15→80, 30→100
+                if (responseTime <= 3) defectScore = 20;
+                else if (responseTime <= 7) defectScore = 40;
+                else if (responseTime <= 10) defectScore = 60;
+                else if (responseTime <= 15) defectScore = 80;
+                else defectScore = 100;
+                
+                totalRDS += defectScore;
+                defectScoreDetails.push({ defect, responseTime, score: defectScore });
+            }
+        });
+        
+        // ✅ ENHANCED: Aggregate RFS using frequency table
+        const totalReportCount = roadReports.length;
+        const aggregatedRFS = DatabaseService.getReportFrequencyScore(totalReportCount);
+        
+        // Apply the aggregation formula: (RTS × 0.40) + (∑RDS × 0.50) + (RFS × 0.10)
+        // CORRECTED: RTS is single value, not summed
+        const aggregatedSeverityScore = (rts * 0.40) + (totalRDS * 0.50) + (aggregatedRFS * 0.10);
+        
+        // Enhanced debug logging for aggregated severity calculation
+        console.log(`🔢 ENHANCED Supabase aggregated severity calculation for road "${roadName}":`, {
+            roadType: firstReport.roadType || firstReport.road_type,
+            rts: rts,
+            totalRDS,
+            totalReportCount: totalReportCount,
+            aggregatedRFS: aggregatedRFS,
+            defectScoreDetails: defectScoreDetails,
+            uniqueDefectsCount: uniqueDefectsForRoad.length,
+            totalDefectsCount: allDefectsForRoad.length,
+            formula: `(${rts} × 0.40) + (${totalRDS} × 0.50) + (${aggregatedRFS} × 0.10)`,
+            calculation: `${rts * 0.40} + ${totalRDS * 0.50} + ${aggregatedRFS * 0.10} = ${aggregatedSeverityScore}`,
+            finalScore: Math.round(aggregatedSeverityScore),
+            rfsBreakdown: `${totalReportCount} reports → RFS ${aggregatedRFS}`
+        });
+        
+        return Math.round(aggregatedSeverityScore);
+    }
+
+    // Enhanced Report Frequency Score mapping based on frequency table
+    static getReportFrequencyScore(reportCount) {
+        if (reportCount >= 1 && reportCount <= 10) return 10;
+        else if (reportCount >= 11 && reportCount <= 20) return 20;
+        else if (reportCount >= 21 && reportCount <= 30) return 30;
+        else if (reportCount >= 31 && reportCount <= 40) return 40;
+        else if (reportCount >= 41 && reportCount <= 50) return 50;
+        else if (reportCount >= 51 && reportCount <= 60) return 60;
+        else if (reportCount >= 61 && reportCount <= 70) return 70;
+        else if (reportCount >= 71 && reportCount <= 80) return 80;
+        else if (reportCount >= 81 && reportCount <= 90) return 90;
+        else if (reportCount >= 91) return 100;
+        else return 10; // Default for any edge cases
     }
 }
 
